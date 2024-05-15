@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+// import { ResponsiveDrawer } from '@/app/components/core/SidebarComponent'
 import "./globals.css";
+import { SidebarComponent } from "./components/core/SidebarComponent";
+import { ThemeProvider } from "@mui/material";
+import { LigthTheme } from "./theme/ligth";
+import { DarkTheme } from "./theme/dark";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="es">
+      <ThemeProvider theme={DarkTheme} >
+      <body className={inter.className}>
+        {children}
+      </body>
+      </ThemeProvider>
     </html>
   );
 }
