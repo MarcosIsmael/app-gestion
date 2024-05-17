@@ -1,10 +1,7 @@
 'use client'
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,11 +9,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MailIcon from '@mui/icons-material/Mail';
-import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { NavbarComponent } from './NavbarComponent';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -33,6 +31,7 @@ export function SidebarComponent(props: Props) {
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const router = useRouter()
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -51,7 +50,7 @@ export function SidebarComponent(props: Props) {
 
   const drawer = (
     <div>
-      <Box mt={1}>
+      <Box component={'div'} mt={1} onClick={()=> router.push('/dashboard')}>
       <Typography sx={{color:'#a65bc5'}} variant='h2' align='center'  >
         GaGa 
       </Typography>
@@ -62,7 +61,8 @@ export function SidebarComponent(props: Props) {
       <List sx={(theme) => ({
         marginTop: '70px',
       })} >
-        {['Productos', 'Ingresos', 'Egresos', 'Promociones'].map((text, index) => (
+        {['Productos', 'Pagos', 'Egresos', 'Promociones'].map((text, index) => (
+          <Link href={`/dashboard/${text.toLowerCase()}`} color='gray' >
           <ListItem key={text} disablePadding >
             <ListItemButton>
               <ListItemIcon>
@@ -71,6 +71,7 @@ export function SidebarComponent(props: Props) {
               <ListItemText primary={text} />
             </ListItemButton>
           </ListItem>
+          </Link>
         ))}
       </List>
       <Divider />

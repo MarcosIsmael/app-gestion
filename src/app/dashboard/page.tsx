@@ -4,8 +4,13 @@ import { IngresoDelMesComponent } from '../components/dashboard/IngresoDelMesCom
 
 const DashboardPage = () => {
   return (
-    <Box display={'flex'}>
+    <Box display={'flex'} flexDirection={'row'} gap={4}>
       <IngresoDelMesComponent/>
+      <IngresoDelMesComponent/>
+      <IngresoDelMesComponent/>
+      <IngresoDelMesComponent/>
+
+
     </Box>
   )
 }

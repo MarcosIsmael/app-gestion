@@ -9,7 +9,7 @@ export const IngresoDelMesComponent = () => {
         <Typography variant='h6'>Felicitaciones Estrella 🎉</Typography>
         <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'}>
           <Box>
-            <Typography variant='body2'>Tus ingresos del mes</Typography>
+            <Typography variant='body2'>Vendedora del mes</Typography>
             <Typography variant='h6'>$ 123000,12</Typography>
             <Box mt={2}>
             <Button variant='contained'>Ver ventas</Button>
