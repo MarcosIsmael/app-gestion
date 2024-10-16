@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model marca {
+  id        Int                      @id @default(autoincrement())
+  nombre    String
+  productos marca_tipo_producto[]
+}
+
+model tipo_producto {
+  id     Int                      @id @default(autoincrement())
+  nombre String
+  marcas marca_tipo_producto[]
+}
+
+model marca_tipo_producto {
+  id                Int               @id @default(autoincrement())
+  marca_id          Int
+  tipo_producto_id   Int
+  marca             marca             @relation(fields: [marca_id], references: [id])
+  tipo_producto     tipo_producto     @relation(fields: [tipo_producto_id], references: [id])
+  productos         producto[]
+}
+
+model producto {
+  codigo                    Int                  @id @default(autoincrement())
+  marca_tipo                Int
+  nombre                    String
+  descripcion               String
+  fecha_ultima_actualizacion DateTime
+  stock                     Int
+  marca_tip_oproducto      marca_tipo_producto  @relation(fields: [marca_tipo], references: [id])
+  precios                   precio_producto[]
+  ventas                    venta_producto[]
+  compras                   compra_producto[]
+}
+
+model precio_producto {
+  id            Int      @id @default(autoincrement())
+  producto_id   Int
+  precio        Float
+  costo         Float
+  fecha_inicio  DateTime
+  fecha_fin     DateTime
+  producto      producto  @relation(fields: [producto_id], references: [codigo])
+}
+
+model registro_de_ventas {
+  id             Int               @id @default(autoincrement())
+  fecha          DateTime
+  importe        Float
+  metodo_pago_id Int
+  metodo_pago    metodo_pago       @relation(fields: [metodo_pago_id], references: [id])
+  productos      venta_producto[]
+}
+
+model metodo_pago {
+  id                  Int                  @id @default(autoincrement())
+  nombre              String
+  registro_de_ventas  registro_de_ventas[]  @relation("MetodosDePago")
+}
+
+model venta_producto {
+  venta_id    Int
+  producto_id Int
+  cantidad    Int
+  venta       registro_de_ventas @relation(fields: [venta_id], references: [id])
+  producto    producto            @relation(fields: [producto_id], references: [codigo])
+  @@id([venta_id, producto_id])
+}
+
+model finanzas {
+  id          Int              @id @default(autoincrement())
+  fecha       DateTime
+  monto       Float
+  descripcion String
+  venta_id    Int
+  compra_id   Int
+  venta       registro_de_ventas @relation(fields: [venta_id], references: [id], name: "VentasFinanzas")
+}
+
+model proveedores {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  contacto  String
+  direccion String
+  compras   compras[]
+}
+
+model compras {
+  id            Int         @id @default(autoincrement())
+  fecha         DateTime
+  proveedor_id  Int
+  importe_total Float
+  proveedor     proveedores @relation(fields: [proveedor_id], references: [id])
+  productos     compra_producto[]
+}
+
+model compra_producto {
+  compra_id    Int
+  producto_id  Int
+  cantidad     Int
+  precio_compra Float
+  compra       compras  @relation(fields: [compra_id], references: [id])
+  producto     producto @relation(fields: [producto_id], references: [codigo])
+  @@id([compra_id, producto_id])
+}

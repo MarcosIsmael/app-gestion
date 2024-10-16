@@ -1,0 +1,117 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model marca {
+  id                   Int                  @id @default(autoincrement())
+  nombre               String
+  marca_tipoproducto   marca_tipoproducto[]
+  producto             producto[]           @relation("MarcaProducto")
+}
+
+model tipoproducto {
+  id                   Int                  @id @default(autoincrement())
+  nombre               String
+  marca_tipoproducto   marca_tipoproducto[]
+}
+
+model marca_tipoproducto {
+  id                 Int       @id @default(autoincrement())
+  marca_id          Int
+  tipo_producto_id   Int
+  marca             marca     @relation(fields: [marca_id], references: [id])
+  tipo_producto     tipoproducto @relation(fields: [tipo_producto_id], references: [id])
+  producto          producto[] @relation("MarcaProducto")
+}
+
+model producto {
+  codigo                 Int                  @id @default(autoincrement())
+  marca_tipo             Int
+  nombre                 String
+  descripcion            String
+  fecha_ultima_actualizacion DateTime
+  stock                  Int
+  marca_tipoproducto     marca_tipoproducto   @relation(fields: [marca_tipo], references: [id])
+  precioproducto         precioproducto[]
+  venta_producto         venta_producto[]
+  compra_producto        compra_producto[]
+}
+
+model precioproducto {
+  id           Int       @id @default(autoincrement())
+  producto_id  Int
+  precio       Decimal   @db.Decimal(10, 2)
+  costo        Decimal   @db.Decimal(10, 2)
+  fecha_inicio DateTime
+  fecha_fin    DateTime
+  producto     producto  @relation(fields: [producto_id], references: [codigo])
+}
+
+model registro_de_ventas {
+  id           Int       @id @default(autoincrement())
+  fecha        DateTime
+  importe      Decimal   @db.Decimal(10, 2)
+  metodo_pago_id Int
+  venta_producto venta_producto[]
+  metodo_pago  metodopago @relation(fields: [metodo_pago_id], references: [id])
+}
+
+model metodopago {
+  id                     Int                 @id @default(autoincrement())
+  nombre                 String
+  registro_de_ventas     registro_de_ventas[]
+}
+
+model venta_producto {
+  venta_id     Int
+  producto_id  Int
+  cantidad     Int
+  registro_de_ventas registro_de_ventas @relation(fields: [venta_id], references: [id])
+  producto     producto              @relation(fields: [producto_id], references: [codigo])
+  @@id([venta_id, producto_id]) // Clave compuesta
+}
+
+model finanzas {
+  id          Int       @id @default(autoincrement())
+  fecha       DateTime
+  monto       Decimal   @db.Decimal(10, 2)
+  descripcion String
+  venta_id    Int
+  compra_id   Int
+  registro_de_ventas  registro_de_ventas @relation(fields: [venta_id], references: [id])
+  compras     compras @relation(fields: [compra_id], references: [id])
+}
+
+model proveedores {
+  id         Int       @id @default(autoincrement())
+  nombre     String
+  contacto   String
+  direccion  String
+  compras    compras[]
+}
+
+model compras {
+  id             Int       @id @default(autoincrement())
+  fecha          DateTime
+  proveedor_id   Int
+  importe_total  Decimal    @db.Decimal(10, 2)
+  compra_producto compra_producto[]
+  proveedor      proveedores @relation(fields: [proveedor_id], references: [id])
+}
+
+model compra_producto {
+  compra_id     Int
+  producto_id   Int
+  cantidad      Int
+  precio_compra Decimal   @db.Decimal(10, 2)
+  compras       compras   @relation(fields: [compra_id], references: [id])
+  producto      producto  @relation(fields: [producto_id], references: [codigo])
+  @@id([compra_id, producto_id]) // Clave compuesta
+}
