@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RowDataPacket } from 'mysql2';
 import connectToDatabase from '@/app/lib/db';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,5 +47,31 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Error al registrar la venta:', error);
     return NextResponse.json({ error: 'Error al registrar la venta.' }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const connection = await connectToDatabase();
+    const [rows] = await connection.query<RowDataPacket[]>(`
+      SELECT 
+        v.id,
+        v.fecha, 
+        p.nombre AS producto, 
+        vp.cantidad, 
+        m.nombre AS metodo_pago, 
+        v.importe 
+      FROM registro_de_ventas v
+      JOIN venta_producto vp ON v.id = vp.venta_id
+      JOIN producto p ON vp.producto_id = p.codigo
+      JOIN metodo_pago m ON v.metodo_pago_id = m.id
+      WHERE MONTH(v.fecha) = MONTH(CURDATE()) AND YEAR(v.fecha) = YEAR(CURDATE())
+    `);
+    
+    await connection.end();
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error('Error fetching sales records:', error);
+    return NextResponse.json({ error: 'Error al obtener las ventas' }, {status:500});
   }
 }

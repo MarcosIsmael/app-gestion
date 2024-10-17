@@ -61,7 +61,7 @@ export function SidebarComponent(props: Props) {
       <List sx={(theme) => ({
         marginTop: '70px',
       })} >
-        {['Productos', 'Pagos', 'Egresos', 'Promociones'].map((text, index) => (
+        {['Productos', 'Pagos', 'Ventas', 'Promociones'].map((text, index) => (
           <Link href={`/dashboard/${text.toLowerCase()}`} color='gray' >
           <ListItem key={text} disablePadding >
             <ListItemButton>
