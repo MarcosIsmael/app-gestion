@@ -1,187 +1,132 @@
+// src/pages/Ventas.tsx
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  Container, Typography, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Box,
   Grid,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Container,
-  Typography
+  Button,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
-import AddMetodoPagoModalComponent from '@/app/components/dashboard/AddMetodoPagoModalComponent';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import Link from 'next/link';
 
-// Tipos para los productos y métodos de pago
-interface Producto {
-  codigo: string;
-  nombre: string;
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+// Tipos para la estructura de datos
+interface Venta {
+  id: number;
+  fecha: string;
+  importe: number;
+  metodo_pago: string;
 }
 
-interface MetodoPago {
-  id: string;
-  nombre: string;
+interface VentasChartData {
+  labels: string[];
+  data: number[];
 }
 
-interface ProductoVenta {
-  productoId: string;
-  cantidad: number;
-}
+const Ventas: React.FC = () => {
+  const [ventas, setVentas] = useState<Venta[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [chartData, setChartData] = useState<VentasChartData>({ labels: [], data: [] });
 
-const RegistrarVentaForm: React.FC = () => {
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const [metodosPago, setMetodosPago] = useState<MetodoPago[]>([]);
-  const [selectedProductos, setSelectedProductos] = useState<ProductoVenta[]>([
-    { productoId: '', cantidad: 1 },
-  ]);
-  const [metodoPagoId, setMetodoPagoId] = useState<string>('');
-  const [importe, setImporte] = useState<string>('');
-
-  // Obtener productos y métodos de pago desde la base de datos
+  // Obtener ventas del mes corriente desde la API
   useEffect(() => {
-    const fetchProductosYMetodos = async () => {
+    const fetchVentas = async () => {
       try {
-        const productosRes = await axios.get('/api/productos');
-        const metodosPagoRes = await axios.get('/api/metodos-pago');
-        setProductos(productosRes.data);
-        console.log('productos resp', productosRes.data)
-        setMetodosPago(metodosPagoRes.data);
+        const response = await fetch('/api/ventas');
+        const data: Venta[] = await response.json();
+        setVentas(data);
+        setLoading(false);
+
+        // Preparar los datos para el gráfico
+        const labels = data.map((venta) => new Date(venta.fecha).toLocaleDateString());
+        const importes = data.map((venta) => venta.importe);
+        setChartData({ labels, data: importes });
       } catch (error) {
-        console.error('Error al obtener productos y métodos de pago:', error);
+        console.error('Error al cargar los datos:', error);
+        setLoading(false);
       }
     };
-    fetchProductosYMetodos();
+    fetchVentas();
   }, []);
 
-  // Manejar la selección de productos
-  const handleProductoChange = (index: number, field: string, value: any) => {
-    const newProductos = [...selectedProductos];
-    newProductos[index] = { ...newProductos[index], [field]: value };
-    setSelectedProductos(newProductos);
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' as const },
+      title: { display: true, text: 'Ventas del Mes Corriente' },
+    },
   };
 
-  // Agregar un nuevo producto
-  const agregarProducto = () => {
-    setSelectedProductos([...selectedProductos, { productoId: '', cantidad: 1 }]);
+  const data = {
+    labels: chartData.labels,
+    datasets: [
+      {
+        label: 'Importe de Ventas',
+        data: chartData.data,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+      },
+    ],
   };
 
-  // Eliminar un producto
-  const eliminarProducto = (index: number) => {
-    const newProductos = [...selectedProductos];
-    newProductos.splice(index, 1);
-    setSelectedProductos(newProductos);
-  };
-
-  // Enviar los datos del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/ventas', {
-        productos: selectedProductos,
-        metodoPagoId,
-        importe,
-      });
-      alert('Venta registrada correctamente.');
-    } catch (error) {
-      console.error('Error al registrar la venta:', error);
-      alert('Hubo un error al registrar la venta.');
-    }
-  };
-console.log('productos',productos)
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Registro de venta
-      </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            {selectedProductos.map((producto, index) => (
-              <React.Fragment key={index}>
-                <Grid item xs={12} sm={5}>
-                  <FormControl fullWidth>
-                    <InputLabel>Producto</InputLabel>
-                    <Select
-                      value={producto.productoId}
-                      onChange={(e) =>
-                        handleProductoChange(index, 'productoId', e.target.value)
-                      }
-                      required
-                    >
-                      {productos.map((prod) => (
-                        <MenuItem key={JSON.stringify(prod)} value={prod.codigo}>
-                          {prod.nombre}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    label="Cantidad"
-                    type="number"
-                    value={producto.cantidad}
-                    onChange={(e) =>
-                      handleProductoChange(index, 'cantidad', parseInt(e.target.value, 10))
-                    }
-                    required
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <IconButton onClick={() => eliminarProducto(index)} color="secondary">
-                    <DeleteIcon />
-                  </IconButton>
-                </Grid>
-              </React.Fragment>
-            ))}
-            <Grid item xs={12}>
-              <Button onClick={agregarProducto} variant="outlined">
-                Agregar Producto
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Método de Pago</InputLabel>
-                <Select
-                  value={metodoPagoId}
-                  onChange={(e) => setMetodoPagoId(e.target.value as string)}
-                  required
-                >
-                  {metodosPago.map((metodo) => (
-                    <MenuItem key={metodo.id} value={metodo.id}>
-                      {metodo.nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <AddMetodoPagoModalComponent/>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Importe Total"
-                type="number"
-                value={importe}
-                onChange={(e) => setImporte(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        <Button type="submit" onClick={handleSubmit} variant="contained" color="primary">
-          Registrar Venta
-        </Button>
-        </form>
+    <Container>
+      <Grid container >
+        <Grid item xs={8}>
+          <Typography variant="h4" gutterBottom>
+            Registro de ventas
+          </Typography>
 
+        </Grid>
+        <Grid item xs={4}>
+          <Link href={'/dashboard/ventas/add'} >
+            <Button color='primary'>
+              Agregar registro de ventas
+            </Button>
+          </Link>
+        </Grid>
+      </Grid>
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Box mt={4}>
+            <Typography variant="h6">Gráfico de Ventas</Typography>
+            <Line options={options} data={data} />
+          </Box>
+
+          <Box mt={4}>
+            <Typography variant="h6">Detalles de Ventas</Typography>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Fecha</TableCell>
+                  <TableCell>Importe</TableCell>
+                  <TableCell>Método de Pago</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {ventas.map((venta) => (
+                  <TableRow key={venta.id}>
+                    <TableCell>{venta.id}</TableCell>
+                    <TableCell>{new Date(venta.fecha).toLocaleDateString()}</TableCell>
+                    <TableCell>${Number(venta.importe).toFixed(2)}</TableCell>
+                    <TableCell>{venta.metodo_pago}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        </>
+      )}
     </Container>
   );
 };
 
-export default RegistrarVentaForm;
+export default Ventas;

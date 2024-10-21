@@ -1,47 +1,125 @@
+// pages/productos.tsx
 'use client'
-import { TarjetaProductoComponent } from '@/app/components/productos'
-import { Box, Button, Typography } from '@mui/material'
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Grid,
+  Typography,
+} from '@mui/material';
+import Link from 'next/link';
 
- export type ProductCat = {
-  id: number,
-  name:string
+interface Producto {
+  codigo: number;
+  nombre: string;
+  stock: number;
 }
-const opcionesProductos = [
-  { label: 'Babysec G x 60', cod: 1, precio: 13000, cantidad:4 },
-  { label: 'Babysec M x 68', cod: 2, precio: 13500, cantidad:40 },
-  { label: 'Babysec XG x 52', cod: 3, precio: 14000, cantidad:10 },
 
-]
-const ProductosPage = () => {
-const [cart, setCart] = useState<ProductCat[]>([])
-const router = useRouter()
+const ProductosPage: React.FC = () => {
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [filter, setFilter] = useState<string>('');
+  const [stockUpdate, setStockUpdate] = useState<{ codigo: number; stock: number }>({
+    codigo: 0,
+    stock: 0,
+  });
 
-const handleProductCart = (product:ProductCat)=>{
-if(!cart.find( p => p.id === product.id)){
-  setCart([...cart,product])
-}else setCart(cart.filter(p => p.id !== product.id))
-}
+  useEffect(() => {
+    const fetchProductos = async () => {
+      const response = await fetch('/api/productos');
+      const data: Producto[] = await response.json();
+      setProductos(data);
+    };
+
+    fetchProductos();
+  }, []);
+
+  const handleUpdateStock = async (codigo: number) => {
+    await fetch('/api/productos/stock', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ codigo, stock: stockUpdate.stock }),
+    });
+    setStockUpdate({ codigo: 0, stock: 0 }); // Reinicia el stock actualizado
+    // Refresca la lista de productos
+    const response = await fetch('/api/productos');
+    const data: Producto[] = await response.json();
+    setProductos(data);
+  };
+
   return (
-    <div>
-      {cart.length > 0 ? 
-      <Box display={'flex'} width={'100%'} justifyContent={'flex-end'} alignItems={'center'}>
-        <Typography color={'error'}> Registrar un pago para {cart?.length} productos </Typography>  
-      <Button color='error' variant='contained' onClick={()=> router.push(`/dashboard/pagos?cod=${cart.map(p => p.id).join('&cod=')}`,)}>Registrar {cart.length}</Button>
-      </Box> : null
-    }
-      <Typography variant='h3'> Productos</Typography>
-      <Box display={'flex'} justifyContent={'flex-start'} flexWrap={'wrap'} gap={4} p={1}>
-       {opcionesProductos.map(v => 
-        (
-          <TarjetaProductoComponent producto={v} handleCheck={handleProductCart} />
-        )
-       )}
-      </Box>
+    <Box p={2}>
+           <Grid container >
+        <Grid item xs={8}>
+          <Typography variant="h4" gutterBottom>
+            Agregar Producto
+          </Typography>
 
-    </div>
-  )
-}
+        </Grid>
+        <Grid item xs={4}>
+          <Link href={'/dashboard/productos/add'} >
+            <Button color='primary'>
+              Agregar Producto
+            </Button>
+          </Link>
+        </Grid>
+      </Grid>
+      <TextField
+        label="Buscar producto"
+        variant="outlined"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        fullWidth
+      />
+      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Stock</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {productos
+              .filter((producto) => producto.nombre.toLowerCase().includes(filter.toLowerCase()))
+              .map((producto) => (
+                <TableRow key={producto.codigo}>
+                  <TableCell>{producto.nombre}</TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      value={stockUpdate.codigo === producto.codigo ? stockUpdate.stock : producto.stock}
+                      onChange={(e) =>
+                        setStockUpdate({ codigo: producto.codigo, stock: Number(e.target.value) })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleUpdateStock(producto.codigo)}
+                    >
+                      Actualizar Stock
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
+};
 
-export default ProductosPage
+export default ProductosPage;

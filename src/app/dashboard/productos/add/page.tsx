@@ -108,9 +108,7 @@ const ProductForm = () => {
     <Container maxWidth="sm">
       <CrearMarcaModalComponent open={modalOpen} handleClose={handleClose} />
       <CrearTipoProductoModalComponent open={tipoProductoModalOpen} handleClose={handleTipoProductoClose} />
-      <Typography variant="h4" gutterBottom>
-        Agregar Producto
-      </Typography>
+ 
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
