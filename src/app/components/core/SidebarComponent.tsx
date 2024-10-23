@@ -50,41 +50,44 @@ export function SidebarComponent(props: Props) {
 
   const drawer = (
     <div>
-      <Box component={'div'} mt={1} onClick={()=> router.push('/dashboard')}>
-      <Typography sx={{color:'#a65bc5'}} variant='h2' align='center'  >
-        GaGa 
-      </Typography>
-      <Typography color={'secondary'} variant='h5' align='center'>
-       Pañales
-      </Typography>
+      <Box component={'div'} mt={1} onClick={() => router.push('/dashboard')}>
+        <Typography sx={{ color: '#a65bc5' }} variant='h2' align='center'  >
+          GaGa
+        </Typography>
+        <Typography color={'secondary'} variant='h5' align='center'>
+          Pañales
+        </Typography>
       </Box>
       <List sx={(theme) => ({
         marginTop: '70px',
       })} >
-        {['Productos', 'Pagos', 'Ventas', 'Promociones'].map((text, index) => (
+        {['Productos', 'Compras', 'Ventas'].map((text, index) => (
           <Link href={`/dashboard/${text.toLowerCase()}`} color='gray' >
-          <ListItem key={text} disablePadding >
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+            <ListItem key={text} disablePadding >
+              <ListItemButton>
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
           </Link>
         ))}
       </List>
       <Divider />
       <List>
-        {['Balance', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {[ 'Finanzas'].map((text, index) => (
+          <Link href={`/dashboard/${text.toLowerCase()}`} color='gray' >
+
+            <ListItem key={text} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         ))}
       </List>
     </div>

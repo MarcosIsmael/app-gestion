@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import connectToDatabase from '@/app/lib/db';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -40,6 +40,10 @@ export async function POST(req: NextRequest) {
         [ventaId, productoId, cantidad]
       );
     }
+    await connection.execute<ResultSetHeader>(
+      'INSERT INTO finanzas (fecha, monto, descripcion, venta_id, compra_id) VALUES (NOW(), ?, ?, ?, ?)',
+      [ importe, `Venta ID: ${ventaId}`, ventaId, null]
+    );
 
     await connection.end();
 

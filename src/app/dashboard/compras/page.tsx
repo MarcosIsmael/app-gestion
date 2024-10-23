@@ -42,7 +42,7 @@ const ComprasPage: React.FC = () => {
               <TableCell>{new Date(compra.fecha).toLocaleDateString()}</TableCell>
               <TableCell>{Number(compra.importeTotal).toFixed(2)}</TableCell>
               <TableCell>
-              <Link href={`/dashboard/compras/detalle?registro=${compra.id}`}>
+              <Link href={`/dashboard/compras/detalle/${compra.id}`}>
                   <Typography variant="body2" color="primary" style={{ cursor: 'pointer' }}>
                     Ver Detalles
                   </Typography>

@@ -39,17 +39,17 @@ const DetalleCompra = () => {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={6}>
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
-                <Storefront sx={{ marginRight: 1 }} /> Proveedor: {compra.proveedorId}
+                <Storefront sx={{ marginRight: 1 }} /> Proveedor: {compra.compra.proveedorNombre}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
-                <Event sx={{ marginRight: 1 }} /> Fecha: {new Date(compra.fecha).toLocaleDateString()}
+                <Event sx={{ marginRight: 1 }} /> Fecha: {new Date(compra.compra.fecha).toLocaleDateString()}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
-                <CurrencyExchange sx={{ marginRight: 1 }} /> Importe Total: ${compra.importeTotal}
+                <CurrencyExchange sx={{ marginRight: 1 }} /> Importe Total: ${compra.compra.importeTotal}
               </Typography>
             </Grid>
           </Grid>
@@ -60,7 +60,7 @@ const DetalleCompra = () => {
         Productos en la Compra
       </Typography>
       <Grid container spacing={2}>
-        {compra.compraProductos.map((producto: any) => (
+        {compra.productos.map((producto: any) => (
           <Grid item xs={12} sm={6} md={4} key={producto.productoId}>
             <Card>
               <CardContent>

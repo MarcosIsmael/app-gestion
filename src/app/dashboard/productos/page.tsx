@@ -1,10 +1,7 @@
-// pages/productos.tsx
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import {
   Box,
-  TextField,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -14,22 +11,22 @@ import {
   Paper,
   Grid,
   Typography,
+  TextField,
+  Button,
 } from '@mui/material';
 import Link from 'next/link';
 
 interface Producto {
   codigo: number;
   nombre: string;
+  descripcion: string;
+  fecha_ultima_actualizacion: string; // Cambié el tipo para reflejar la fecha
   stock: number;
 }
 
 const ProductosPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filter, setFilter] = useState<string>('');
-  const [stockUpdate, setStockUpdate] = useState<{ codigo: number; stock: number }>({
-    codigo: 0,
-    stock: 0,
-  });
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -41,32 +38,31 @@ const ProductosPage: React.FC = () => {
     fetchProductos();
   }, []);
 
-  const handleUpdateStock = async (codigo: number) => {
-    await fetch('/api/productos/stock', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ codigo, stock: stockUpdate.stock }),
-    });
-    setStockUpdate({ codigo: 0, stock: 0 }); // Reinicia el stock actualizado
-    // Refresca la lista de productos
-    const response = await fetch('/api/productos');
-    const data: Producto[] = await response.json();
-    setProductos(data);
+  const handleDelete = async (codigo: number) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
+    if (confirmDelete) {
+      const response = await fetch(`/api/productos/${codigo}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        // Refresca la lista de productos después de eliminar
+        setProductos((prev) => prev.filter((producto) => producto.codigo !== codigo));
+      } else {
+        console.error("Error al eliminar el producto");
+      }
+    }
   };
 
   return (
     <Box p={2}>
-           <Grid container >
+      <Grid container>
         <Grid item xs={8}>
           <Typography variant="h4" gutterBottom>
-            Agregar Producto
+            Productos
           </Typography>
-
         </Grid>
         <Grid item xs={4}>
-          <Link href={'/dashboard/productos/add'} >
+          <Link href={'/dashboard/productos/add'}>
             <Button color='primary'>
               Agregar Producto
             </Button>
@@ -85,32 +81,35 @@ const ProductosPage: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell>Fecha Última Actualización</TableCell>
               <TableCell>Stock</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell>Acciones</TableCell> {/* Nueva columna para acciones */}
             </TableRow>
           </TableHead>
           <TableBody>
             {productos
               .filter((producto) => producto.nombre.toLowerCase().includes(filter.toLowerCase()))
               .map((producto) => (
-                <TableRow key={producto.codigo}>
+                <TableRow
+                  key={producto.codigo}
+                  onClick={() => (window.location.href = `/dashboard/productos/${producto.codigo}`)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <TableCell>{producto.nombre}</TableCell>
-                  <TableCell>
-                    <TextField
-                      type="number"
-                      value={stockUpdate.codigo === producto.codigo ? stockUpdate.stock : producto.stock}
-                      onChange={(e) =>
-                        setStockUpdate({ codigo: producto.codigo, stock: Number(e.target.value) })
-                      }
-                    />
-                  </TableCell>
+                  <TableCell>{producto.descripcion}</TableCell>
+                  <TableCell>{new Date(producto.fecha_ultima_actualizacion).toLocaleDateString()}</TableCell>
+                  <TableCell>{producto.stock}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
-                      color="primary"
-                      onClick={() => handleUpdateStock(producto.codigo)}
+                      color="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evita que la fila se seleccione al hacer clic en el botón
+                        handleDelete(producto.codigo);
+                      }}
                     >
-                      Actualizar Stock
+                      Eliminar
                     </Button>
                   </TableCell>
                 </TableRow>

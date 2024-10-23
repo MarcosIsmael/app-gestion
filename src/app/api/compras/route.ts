@@ -14,21 +14,47 @@ export async function POST(req: Request) {
 
     const connection = await connectToDatabase();
 
-    // Insertar la compra
-    const [result] = await connection.execute<ResultSetHeader>(
-      'INSERT INTO compras (fecha, proveedor_id, importe_total) VALUES (?, ?, ?)',
-      [fecha, proveedorId, parseFloat(importeTotal)] // Asegúrate de que importeTotal sea un número
-    );
+    // Iniciar una transacción
+    await connection.beginTransaction();
 
-    // Obtener el ID de la compra recién creada
-    const compraId = result.insertId;
+    try {
+      // Insertar la compra en la tabla "compras"
+      const [result] = await connection.execute<ResultSetHeader>(
+        'INSERT INTO compras (fecha, proveedor_id, importe_total) VALUES (?, ?, ?)',
+        [fecha, proveedorId, parseFloat(importeTotal)]
+      );
 
-    // Aquí deberías agregar la lógica para insertar los productos en la tabla correspondiente, si es necesario.
+      // Obtener el ID de la compra recién creada
+      const compraId = result.insertId;
 
-    // Cerrar la conexión
-    await connection.end();
+      // Insertar los productos en la tabla "compra_producto"
+      for (const producto of compraProductos) {
+        const { productoId, cantidad, precioCompra } = producto;
 
-    return NextResponse.json({ insertId: compraId }, { status: 201 });
+        await connection.execute(
+          'INSERT INTO compra_producto (compra_id, producto_id, cantidad, precio_compra) VALUES (?, ?, ?, ?)',
+          [compraId, productoId, cantidad, parseFloat(precioCompra)]
+        );
+      }
+      const ventaId = null; // o el valor correspondiente
+      // const compraId = null; // o el valor correspondiente
+      
+      await connection.execute<ResultSetHeader>(
+        'INSERT INTO finanzas (fecha, monto, descripcion, venta_id, compra_id) VALUES (?, ?, ?, ?, ?)',
+        [fecha, -parseFloat(importeTotal), `Compra ID: ${compraId}`, ventaId, compraId]
+      );
+      // Confirmar la transacción
+      await connection.commit();
+
+      // Cerrar la conexión
+      await connection.end();
+
+      return NextResponse.json({ insertId: compraId }, { status: 201 });
+    } catch (error) {
+      // Revertir la transacción en caso de error
+      await connection.rollback();
+      throw error;
+    }
   } catch (error) {
     console.error('Error al guardar la compra:', error);
     return NextResponse.json({ error: 'Error al guardar la compra' }, { status: 500 });
