@@ -76,7 +76,7 @@ export function SidebarComponent(props: Props) {
       </List>
       <Divider />
       <List>
-        {[ 'Finanzas'].map((text, index) => (
+        {[ 'Finanzas', 'Estadisticas'].map((text, index) => (
           <Link href={`/dashboard/${text.toLowerCase()}`} color='gray' >
 
             <ListItem key={text} disablePadding>

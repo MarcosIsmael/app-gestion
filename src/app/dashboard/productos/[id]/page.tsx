@@ -6,11 +6,12 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useParams } from 'next/navigation';
+// import {  useRouter } from 'next/router';
+import { useParams, useRouter } from 'next/navigation';
 
 const EditarProducto: React.FC = () => {
   const { id } = useParams(); // Obtener el id del producto desde la URL
+  const router = useRouter()
   const [producto, setProducto] = useState<any>({
     nombre: '',
     descripcion: '',
