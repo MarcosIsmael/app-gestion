@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import React from 'react'
 import { SidebarComponent } from '../components/core/SidebarComponent';
+import { Paper } from '@mui/material';
 interface Props {
     children: React.ReactNode
 }
@@ -10,8 +11,13 @@ export const metadata: Metadata = {
   };
 export default function Layout({children}:Props) {
   return (
-    <SidebarComponent>
+  
+    <Paper>
+    <SidebarComponent/>
+
+    {children}
     
-        {children}</SidebarComponent>
+    </Paper>
+    
   )
 }

@@ -5,34 +5,34 @@ import { createTheme } from '@mui/material/styles';
 
 export const LigthTheme = createTheme({
   palette: {
+    mode: 'light',
     primary: {
-      main: '#520b88', // Cambia este color según tus preferencias
-      contrastText: '#ffff',
+      main: '#1995AD', // Teal
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#9520c5', // Cambia este color según tus preferencias
-      contrastText: '#ffff',
+      main: '#A1D6E2', // Azul claro
+      contrastText: '#000000',
     },
     background: {
-      default: '#520b88', // Color de fondo predeterminado para todos los componentes
-      paper: '#520b88'
+      default: '#F1F1F2', // Gris claro
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#2A3132', // Gris oscuro para el texto
+      secondary: '#1995AD', // Teal secundario para subtítulos o texto menos importante
     },
     action: {
-      hover: '#9520c5', // Color para hover
-      active: '#9520c5', // Color para active
-      focus:'#9520c5'
+      active: '#1995AD', // Teal para iconos activos
+      disabled: '#A1D6E2', // Azul claro para iconos desactivados
     },
-    divider: '#a65bc5',
-    text: {
-      primary: '#efecec', // Color para texto
-      secondary:'#9520c5'
+    icon: {
+      main: '#1995AD', // Color para iconos en estado normal
     },
-    common:{
-      black:'#520b88'
-    }
-
   },
-
+  typography: {
+    fontFamily: 'Roboto, Arial, sans-serif',
+  },
 
 });
 

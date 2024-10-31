@@ -6,6 +6,8 @@ import { SidebarComponent } from "./components/core/SidebarComponent";
 import { ThemeProvider } from "@mui/material";
 import { LigthTheme } from "./theme/ligth";
 import { DarkTheme } from "./theme/dark";
+import { ThemeComponent } from "./components/core/ThemeComponent";
+import { ThemeProviderComponent } from "./theme/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +23,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <ThemeProvider theme={DarkTheme} >
+      {/* <ThemeProvider theme={DarkTheme} > */}
+      <ThemeProviderComponent>
       <body className={inter.className}>
         {children}
       </body>
-      </ThemeProvider>
+      </ThemeProviderComponent>
+      {/* </ThemeProvider> */}
     </html>
   );
 }
