@@ -73,7 +73,7 @@ const Ventas: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container >
       <Grid container >
         <Grid item xs={8}>
           <Typography variant="h4" gutterBottom>
@@ -83,7 +83,7 @@ const Ventas: React.FC = () => {
         </Grid>
         <Grid item xs={4}>
           <Link href={'/dashboard/ventas/add'} >
-            <Button color='primary'>
+            <Button color='primary' variant='contained'>
               Agregar registro de ventas
             </Button>
           </Link>

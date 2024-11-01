@@ -14,11 +14,10 @@ export default function Layout({ children }: Props) {
     <Box>
 
       <SidebarComponent />
-      <Box ml={8} >
-        <Paper>
-
+      <Box ml={7}  >
+        < Box component={Paper} pt={2}>
           {children}
-        </Paper>
+        </Box>
       </Box>
     </Box>
 
