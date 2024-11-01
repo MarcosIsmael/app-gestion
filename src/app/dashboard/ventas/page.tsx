@@ -9,6 +9,7 @@ import {
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -29,7 +30,7 @@ const Ventas: React.FC = () => {
   const [ventas, setVentas] = useState<Venta[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [chartData, setChartData] = useState<VentasChartData>({ labels: [], data: [] });
-
+  const router = useRouter()
   // Obtener ventas del mes corriente desde la API
   useEffect(() => {
     const fetchVentas = async () => {
@@ -104,7 +105,7 @@ const Ventas: React.FC = () => {
             <Typography variant="h6">Historial de Ventas</Typography>
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow >
                   <TableCell>ID</TableCell>
                   <TableCell>Fecha</TableCell>
                   <TableCell>Importe</TableCell>
@@ -113,7 +114,11 @@ const Ventas: React.FC = () => {
               </TableHead>
               <TableBody>
                 {ventas.map((venta) => (
-                  <TableRow key={venta.id}>
+                      <TableRow
+                      key={venta.id}
+                      onClick={() => router.push(`/dashboard/ventas/detalle/${venta.id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
                     <TableCell>{venta.id}</TableCell>
                     <TableCell>{new Date(venta.fecha).toLocaleDateString()}</TableCell>
                     <TableCell>${Number(venta.importe).toFixed(2)}</TableCell>
