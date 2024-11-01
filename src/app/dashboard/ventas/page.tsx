@@ -101,7 +101,7 @@ const Ventas: React.FC = () => {
           </Box>
 
           <Box mt={4}>
-            <Typography variant="h6">Detalles de Ventas</Typography>
+            <Typography variant="h6">Historial de Ventas</Typography>
             <Table>
               <TableHead>
                 <TableRow>
