@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 // import { ResponsiveDrawer } from '@/app/components/core/SidebarComponent'
 import "./globals.css";
 import { SidebarComponent } from "./components/core/SidebarComponent";
-import { ThemeProvider } from "@mui/material";
+import { Box, ThemeProvider } from "@mui/material";
 import { LigthTheme } from "./theme/ligth";
 import { DarkTheme } from "./theme/dark";
 import { ThemeComponent } from "./components/core/ThemeComponent";
@@ -22,14 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      {/* <ThemeProvider theme={DarkTheme} > */}
-      <ThemeProviderComponent>
-      <body className={inter.className}>
-        {children}
-      </body>
-      </ThemeProviderComponent>
-      {/* </ThemeProvider> */}
-    </html>
+    <ThemeProviderComponent>
+      <Box component={'html'} lang="es" bgcolor={'background.default'} >
+        <body>
+          <Box bgcolor={'Background'}>
+
+            {children}
+          </Box>
+        </body>
+      </Box>
+    </ThemeProviderComponent>
   );
 }

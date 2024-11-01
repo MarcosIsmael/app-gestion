@@ -7,6 +7,7 @@ import { useThemeContext } from '@/app/theme/ThemeContext';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
+
 const drawerWidth = 240;
 
 export const SidebarComponent = () => {
@@ -33,24 +34,25 @@ export const SidebarComponent = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [handleOutsideClick]);
-  console.log('pathname', pathname)
+
   useEffect(() => {
-    const currentPath = router;
-    const currentIndex = menuItems.findIndex(item => item.text.includes(pathname));
+
+    const currentIndex = menuItems.findIndex(item => pathname.includes(item.path));
     if (currentIndex !== -1) {
       setSelectedIndex(currentIndex);
     }
   }, [pathname]);
   const menuItems = [
-    { text: 'Home', icon: <Home /> },
-    { text: 'Productos', icon: <ShoppingCart /> },
-    { text: 'Ventas', icon: <AttachMoney /> },
-    { text: 'Compras', icon: <ShoppingBag /> },
-    { text: 'Finanzas', icon: <BarChart /> },
-    { text: 'Estadisticas', icon: <Assessment /> },
-    { text: 'Configuracion', icon: <Settings /> },
+    { text: 'Home', icon: <Home />,path:'/dashboard/home' },
+    { text: 'Productos', icon: <ShoppingCart />,path:'/dashboard/productos' },
+    { text: 'Ventas', icon: <AttachMoney />, path:'/dashboard/ventas' },
+    { text: 'Compras', icon: <ShoppingBag />, path:'/dashboard/compras' },
+    { text: 'Finanzas', icon: <BarChart />, path:'/dashboard/finanzas' },
+    { text: 'Estadisticas', icon: <Assessment />,path:'/dashboard/estadisticas' },
+    { text: 'Configuracion', icon: <Settings />,path:'/dashboard/configuracion' },
   ];
 
+  
   return (
     <Drawer
       variant="permanent"

@@ -1,7 +1,7 @@
 // src/app/dashboard/compras/page.tsx
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
 interface Compra {
@@ -25,6 +25,8 @@ const ComprasPage: React.FC = () => {
   }, []);
 
   return (
+    <Box>
+      <Typography variant='h4'> Registro de compras</Typography>
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
@@ -53,6 +55,7 @@ const ComprasPage: React.FC = () => {
         </TableBody>
       </Table>
     </TableContainer>
+    </Box>
   );
 };
 
