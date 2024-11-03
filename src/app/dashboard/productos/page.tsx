@@ -15,6 +15,8 @@ import {
   Button,
 } from '@mui/material';
 import Link from 'next/link';
+import CrearMarcaModalComponent from '@/app/components/productos/marcas/CrearMarcaModalComponent';
+import CrearTipoProductoModalComponent from '@/app/components/productos/tipos/CrearTipoProductoModalComponent';
 
 interface Producto {
   codigo: number;
@@ -27,7 +29,8 @@ interface Producto {
 const ProductosPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filter, setFilter] = useState<string>('');
-
+  const [modalOpen, setModalOpen] = useState(false);
+  const [tipoProductoModalOpen, setTipoProductoModalOpen] = useState(false);
   useEffect(() => {
     const fetchProductos = async () => {
       const response = await fetch('/api/productos');
@@ -52,18 +55,34 @@ const ProductosPage: React.FC = () => {
       }
     }
   };
-
+  const handleOpen = () => setModalOpen(true);
+  const handleClose = () => setModalOpen(false);
+  const handleTipoProductoOpen = () => setTipoProductoModalOpen(true);
+  const handleTipoProductoClose = () => setTipoProductoModalOpen(false);
   return (
     <Box p={2}>
+      <CrearMarcaModalComponent open={modalOpen} handleClose={handleClose} />
+      <CrearTipoProductoModalComponent open={tipoProductoModalOpen} handleClose={handleTipoProductoClose} />
+
       <Grid container>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Typography variant="h4" gutterBottom>
             Productos
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
+          <Button color='primary' size='small' variant='outlined' onClick={handleOpen}>
+            Nueva marca
+          </Button>
+          {/* <Link href={'/dashboard/productos/add/marca'}>
+          </Link> */}
+          <Button color='primary' size='small' variant='outlined' onClick={handleTipoProductoOpen}>
+            Nuevo tipo
+          </Button>
+          {/* <Link href={'/dashboard/productos/add/tipo'}>
+          </Link> */}
           <Link href={'/dashboard/productos/add'}>
-            <Button color='primary'>
+            <Button color='primary' size='small' variant='outlined'>
               Agregar Producto
             </Button>
           </Link>
