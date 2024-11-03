@@ -1,19 +1,18 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Divider, IconButton } from '@mui/material';
-import { Home, ShoppingCart, AttachMoney, ShoppingBag, Assessment, BarChart, Settings, ArrowBackIos, ArrowForward } from '@mui/icons-material';
+import { Home, ShoppingCart, AttachMoney, ShoppingBag, Assessment, BarChart, Settings } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useThemeContext } from '@/app/theme/ThemeContext';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-
 
 const drawerWidth = 240;
 
 export const SidebarComponent = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
-  const pathname = usePathname()
+  const pathname = usePathname();
   const { toggleTheme, mode } = useThemeContext();
   const [open, setOpen] = useState(false);
 
@@ -22,45 +21,38 @@ export const SidebarComponent = () => {
     router.push(path);
   };
 
-  const toggleDrawer = useCallback(() => setOpen(prevOpen => !prevOpen), []);
-  
-  const handleOutsideClick = useCallback((event) => {
-    if (!event.target.closest('.MuiDrawer-paper') && open) {
-      setOpen(false);
-    }
-  }, [open]);
+  const handleMouseEnter = () => setOpen(true);
+  const handleMouseLeave = () => setOpen(false);
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [handleOutsideClick]);
-
-  useEffect(() => {
-
     const currentIndex = menuItems.findIndex(item => pathname.includes(item.path));
     if (currentIndex !== -1) {
       setSelectedIndex(currentIndex);
     }
   }, [pathname]);
+
   const menuItems = [
-    { text: 'Home', icon: <Home />,path:'/dashboard/home' },
-    { text: 'Productos', icon: <ShoppingCart />,path:'/dashboard/productos' },
-    { text: 'Ventas', icon: <AttachMoney />, path:'/dashboard/ventas' },
-    { text: 'Compras', icon: <ShoppingBag />, path:'/dashboard/compras' },
-    { text: 'Finanzas', icon: <BarChart />, path:'/dashboard/finanzas' },
-    { text: 'Estadisticas', icon: <Assessment />,path:'/dashboard/estadisticas' },
-    { text: 'Configuracion', icon: <Settings />,path:'/dashboard/configuracion' },
+    { text: 'Home', icon: <Home />, path: '/dashboard/home' },
+    { text: 'Productos', icon: <ShoppingCart />, path: '/dashboard/productos' },
+    { text: 'Ventas', icon: <AttachMoney />, path: '/dashboard/ventas' },
+    { text: 'Compras', icon: <ShoppingBag />, path: '/dashboard/compras' },
+    { text: 'Finanzas', icon: <BarChart />, path: '/dashboard/finanzas' },
+    { text: 'Estadisticas', icon: <Assessment />, path: '/dashboard/estadisticas' },
+    { text: 'Configuracion', icon: <Settings />, path: '/dashboard/configuracion' },
   ];
 
-  
   return (
     <Drawer
       variant="permanent"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
         width: open ? drawerWidth : 64,
         flexShrink: 0,
+        transition: 'width 0.3s ease', // Agrega transición suave al ancho
         [`& .MuiDrawer-paper`]: {
           width: open ? drawerWidth : 64,
+          transition: 'width 0.3s ease', // Agrega transición suave al papel
           boxSizing: 'border-box',
           backgroundColor: '#1e1e1e',
           color: '#ffffff',
@@ -68,12 +60,8 @@ export const SidebarComponent = () => {
         },
       }}
     >
-      <Box width="100%" justifyContent="flex-end" display="flex">
-        <IconButton onClick={toggleDrawer}>
-          {open ? <ArrowBackIos /> : <ArrowForward />}
-        </IconButton>
-      </Box>
       <Box sx={{ padding: open ? '16px' : '8px', backgroundColor: '#121212', textAlign: open ? 'left' : 'center' }}>
+        <Box height={70} pt={3} pb={3}>
         <Typography variant="h6" noWrap>
           {open ? 'Panel de control' : 'PC'}
         </Typography>
@@ -84,6 +72,7 @@ export const SidebarComponent = () => {
               {mode === 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
             </IconButton>
           </Typography>
+        </Box>
         </Box>
       </Box>
       <Divider />
