@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useThemeContext } from '@/app/theme/ThemeContext';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import TrendingDown from '@mui/icons-material/TrendingDown';
 
 const drawerWidth = 240;
 
@@ -37,6 +38,8 @@ export const SidebarComponent = () => {
     { text: 'Ventas', icon: <AttachMoney />, path: '/dashboard/ventas' },
     { text: 'Compras', icon: <ShoppingBag />, path: '/dashboard/compras' },
     { text: 'Finanzas', icon: <BarChart />, path: '/dashboard/finanzas' },
+    { text: 'Ingresos', icon: <AttachMoney />, path: '/dashboard/ingresos' },
+    { text: 'Egresos', icon: <TrendingDown />, path: '/dashboard/egresos' },
     { text: 'Estadisticas', icon: <Assessment />, path: '/dashboard/estadisticas' },
     { text: 'Configuracion', icon: <Settings />, path: '/dashboard/configuracion' },
   ];

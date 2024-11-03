@@ -9,8 +9,8 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AddIngresoModalComponent } from '@/app/components/dashboard/AddIngresoModalComponent';
-import { AcumuladoGraficoComponent } from '@/app/components/dashboard/AcumuladoGraficoComponent';
 import { TotalComponent } from '@/app/components/dashboard/TotalComponent';
+import { AcumuladoGraficoComponent } from '@/app/components/dashboard/AcumuladoGraficoComponent';
 
 // Tipos para la estructura de datos
 interface Ingreso {
@@ -22,7 +22,7 @@ interface Ingreso {
 }
 
 
-const Egresos: React.FC = () => {
+const Ventas: React.FC = () => {
   const [ventas, setVentas] = useState<Ingreso[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter()
@@ -30,7 +30,7 @@ const Egresos: React.FC = () => {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const response = await fetch('/api/egresos');
+        const response = await fetch('/api/ingresos');
         const data: Ingreso[] = await response.json();
         setVentas(data);
         setLoading(false);
@@ -48,7 +48,7 @@ const Egresos: React.FC = () => {
       <Grid container display={'flex'} alignItems={'center'} >
         <Grid item xs={6}>
           <Typography variant="h4" gutterBottom>
-            Registro de Egresos
+            Registro de Ingresos
           </Typography>
 
         </Grid>
@@ -56,7 +56,7 @@ const Egresos: React.FC = () => {
             <AddIngresoModalComponent/>
           <Link href={'/dashboard/ventas/add'} >
             <Button color='primary' variant='contained'>
-              Agregar registro de Egresos
+              Agregar registro de ventas
             </Button>
           </Link>
         </Grid>
@@ -70,7 +70,7 @@ const Egresos: React.FC = () => {
       ) : (
         <>
           <Box mt={4}>
-            <Typography variant="h6">Historial de Egresos</Typography>
+            <Typography variant="h6">Historial de Ingresos</Typography>
             <Table>
               <TableHead>
                 <TableRow >
@@ -100,4 +100,4 @@ const Egresos: React.FC = () => {
   );
 };
 
-export default Egresos;
+export default Ventas;
