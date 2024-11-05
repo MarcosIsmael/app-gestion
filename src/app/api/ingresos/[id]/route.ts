@@ -58,11 +58,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         descripcion: ingreso.descripcion,
         metodo_de_pago: ingreso.metodoPago,
       },
-      productos: productosData.map((producto: { productoId: any; productoNombre: any; cantidad: any; precioCompra: any; }) => ({
+      productos: productosData.map((producto: { productoId: any; productoNombre: any; cantidad: any; precioCompra: any; precioFinal:any; fotoUrl:any }) => ({
         productoId: producto.productoId,
         productoNombre: producto.productoNombre,
         cantidad: producto.cantidad,
         precioCompra: producto.precioCompra,
+        precioFinal:producto.precioFinal,
+        fotoUrl:producto.fotoUrl
       })),
     };
 
