@@ -9,7 +9,7 @@ type Producto = {
   stock: number;
   fecha_ultima_actualizacion: string;
   foto_url: string | null;
-  precio: string;
+  precioCompra: string;
 };
 type Ingreso = {
     id: number,
@@ -60,8 +60,7 @@ const VentaDetailPage =async ({ params }: { params: { id: string } }) => {
                 <Grid item xs={9}>
                   <Typography variant="h6">{producto.nombre}</Typography>
                   <Typography variant="body2" color="textSecondary">Cantidad: {producto.cantidad}</Typography>
-                  <Typography variant="body2" color="textSecondary">Precio Unitario: ${producto.precio}</Typography>
-                  <Typography variant="body2" color="textSecondary">Stock Disponible: {producto.stock}</Typography>
+                  <Typography variant="body2" color="textSecondary">Precio Unitario: ${producto.precioCompra}</Typography>
                 </Grid>
               </Grid>
             </CardContent>
