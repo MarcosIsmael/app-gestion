@@ -21,7 +21,15 @@ const data = [
   { name: 'Julio', gastos: 3490 },
 ];
 
- export const AcumuladoGraficoComponent = () => {
+type DataType = {
+  name:string,
+  monto:number
+}
+interface Props {
+  data :DataType[]
+}
+
+ export const AcumuladoGraficoComponent = ({ data}:Props) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data}>
@@ -30,7 +38,7 @@ const data = [
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="gastos" stroke="#8884d8" activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="monto" stroke="#8884d8" activeDot={{ r: 8 }} />
       </LineChart>
     </ResponsiveContainer>
   );

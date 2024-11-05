@@ -17,7 +17,7 @@ interface Ingreso {
   id: number;
   fecha: string;
   monto: number;
-  descripcion:string;
+  descripcion: string;
   metodo_de_pago: string;
 }
 
@@ -53,7 +53,7 @@ const Egresos: React.FC = () => {
 
         </Grid>
         <Grid item xs={6} display={'flex'} gap={1} flexDirection={'row'}>
-            <AddIngresoModalComponent/>
+          <AddIngresoModalComponent />
           <Link href={'/dashboard/ventas/add'} >
             <Button color='primary' variant='contained'>
               Agregar registro de Egresos
@@ -61,8 +61,21 @@ const Egresos: React.FC = () => {
           </Link>
         </Grid>
       </Grid>
-      <TotalComponent total={400} />
-      <AcumuladoGraficoComponent/>
+      <Grid container justifyContent={'space-between'}>
+        <Grid item xs={3}>
+          <TotalComponent total={ventas.reduce((acumulado, data) => {
+            return acumulado + Number(data.monto);
+          }, 0)} titulo='Total de Egresos' />
+        </Grid>
+        <Grid item xs={8} >
+          <AcumuladoGraficoComponent data={ventas.map((ingreso) => ({
+            name: new Date(ingreso.fecha).toLocaleDateString('es-ES', {
+              month: 'short',
+            }),
+            monto: ingreso.monto
+          }))} />
+        </Grid>
+      </Grid>
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}>
           <CircularProgress />
@@ -81,11 +94,11 @@ const Egresos: React.FC = () => {
               </TableHead>
               <TableBody>
                 {ventas.map((ingreso) => (
-                      <TableRow
-                      key={ingreso.id}
-                      onClick={() => router.push(`/dashboard/ingresos/detalle/${ingreso.id}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                  <TableRow
+                    key={ingreso.id}
+                    onClick={() => router.push(`/dashboard/ingresos/detalle/${ingreso.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <TableCell>{new Date(ingreso.fecha).toLocaleDateString()}</TableCell>
                     <TableCell>${Number(ingreso.monto).toFixed(2)}</TableCell>
                     <TableCell>{ingreso.metodo_de_pago}</TableCell>
