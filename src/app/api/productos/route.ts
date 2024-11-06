@@ -33,9 +33,18 @@ export async function GET(req:NextApiRequest, res:NextApiResponse) {
 export async function POST(req:Request, res:NextApiResponse) {
 
   try {
-    const body= await req.json()
-    const { marca,tipoProducto,nombre, descripcion, stock,precio, costo } = body
-    console.log(body)
+    // const body= await req.json()
+    // const { marca,tipoProducto,nombre, descripcion, stock,precio, costo } = body
+    // console.log(body)
+    const formData = await req.formData();
+    const nombre = formData.get('nombre');
+    const descripcion = formData.get('descripcion');
+    const stock = formData.get('stock');
+    const marca = formData.get('marca');
+    const tipoProducto = formData.get('tipoProducto');
+    const precio = formData.get('precio');
+    const costo = formData.get('costo');
+    const imagen = formData.get('imagen') as File;
     if (
       !nombre || 
       !descripcion || 
@@ -105,8 +114,8 @@ export async function POST(req:Request, res:NextApiResponse) {
 
     // 4. Insertar el producto en la tabla `producto`
     const [resultProducto] = await connection.execute<OkPacket>(
-      'INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion) VALUES (?, ?, ?, ?, NOW())',
-      [nombre, descripcion, stock, marcaTipoProductoId]
+      'INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion, foto_url) VALUES (?, ?, ?, ?, NOW(), ?)',
+      [nombre, descripcion, stock, marcaTipoProductoId, imagen]
     );
 
     const productoId = resultProducto.insertId; // Obtener el ID del producto insertado

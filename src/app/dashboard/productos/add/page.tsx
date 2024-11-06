@@ -28,6 +28,7 @@ const ProductForm = () => {
   const [marcas, setMarcas] = useState<{ id: number; nombre: string }[]>([]);
   const [tiposProducto, setTiposProducto] = useState<{ id: number; nombre: string }[]>([]);
   const [error, setError] = useState('');
+  const [imagen, setImagen] = useState<File | null>(null);
   const [success, setSuccess] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [tipoProductoModalOpen, setTipoProductoModalOpen] = useState(false);
@@ -66,19 +67,25 @@ const ProductForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validación básica
-    if (!nombre || !descripcion || stock === '' || !marcaNombre || tipoProducto === '' || precio === '' || costo === '') {
-      setError('Todos los campos son obligatorios');
+    if (!nombre || !descripcion || stock === '' || !marcaNombre || tipoProducto === '' || precio === '' || costo === '' || !imagen) {
+      setError('Todos los campos son obligatorios, incluida la imagen');
       return;
     }
+
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('descripcion', descripcion);
+    formData.append('stock', String(stock));
+    formData.append('marca', marcaNombre);
+    formData.append('tipoProducto', tipoProducto);
+    formData.append('precio', String(precio));
+    formData.append('costo', String(costo));
+    formData.append('imagen', imagen);
 
     try {
       const response = await fetch('/api/productos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nombre, descripcion, stock, marca: marcaNombre, tipoProducto, precio, costo }),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -86,7 +93,6 @@ const ProductForm = () => {
       }
 
       setSuccess(true);
-      // Resetear campos
       setNombre('');
       setDescripcion('');
       setStock('');
@@ -94,6 +100,7 @@ const ProductForm = () => {
       setTipoProducto('');
       setPrecio('');
       setCosto('');
+      setImagen(null);
     } catch (error) {
       setError('Error al agregar el producto');
     }
@@ -103,12 +110,16 @@ const ProductForm = () => {
     setError('');
     setSuccess(false);
   };
-
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImagen(e.target.files[0]);
+    }
+  };
   return (
     <Container maxWidth="sm">
       <CrearMarcaModalComponent open={modalOpen} handleClose={handleClose} />
       <CrearTipoProductoModalComponent open={tipoProductoModalOpen} handleClose={handleTipoProductoClose} />
- 
+
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -220,6 +231,7 @@ const ProductForm = () => {
               }}
             />
           </Grid>
+
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -234,6 +246,14 @@ const ProductForm = () => {
                 shrink: true, // Esto evitará que el label se mueva
               }}
             />
+          </Grid>
+          {/* Campo para cargar la imagen */}
+          <Grid item xs={12}>
+            <Button variant="contained" component="label" fullWidth>
+              Subir Imagen
+              <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            </Button>
+            {imagen && <Typography variant="body2">Archivo seleccionado: {imagen.name}</Typography>}
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" fullWidth>
