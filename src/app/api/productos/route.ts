@@ -2,6 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import connectToDatabase from '../../lib/db';
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { NextResponse } from 'next/server';
+import { google } from 'googleapis';
+import { v2 as cloudinary } from 'cloudinary';
+import { arrayBuffer } from 'stream/consumers';
+
 
 interface ProductoDBTypes {
   codigo: number;
@@ -26,127 +30,80 @@ export async function GET(req:NextApiRequest, res:NextApiResponse) {
     return NextResponse.json(rows);
   } catch (error) {
     console.error('Error al conectarse a la base de datos o realizar la consulta:', error);
-    NextResponse.json({ error: 'Error en la base de datos' });
+    return NextResponse.json({ error: 'Error en la base de datos' });
   }
 }
 
-export async function POST(req:Request, res:NextApiResponse) {
 
+export const config = {
+  api: {
+    bodyParser: true, // Necesario para manejar la carga de archivos con formidable
+  },
+};
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Configura tus variables de entorno
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export async function POST(req: Request, res: NextApiResponse) {
   try {
-    // const body= await req.json()
-    // const { marca,tipoProducto,nombre, descripcion, stock,precio, costo } = body
-    // console.log(body)
-    const formData = await req.formData();
-    const nombre = formData.get('nombre');
-    const descripcion = formData.get('descripcion');
-    const stock = formData.get('stock');
-    const marca = formData.get('marca');
-    const tipoProducto = formData.get('tipoProducto');
-    const precio = formData.get('precio');
-    const costo = formData.get('costo');
-    const imagen = formData.get('imagen') as File;
-    if (
-      !nombre || 
-      !descripcion || 
-      stock === undefined || 
-      !marca || 
-      !tipoProducto || 
-      precio === undefined || 
-      costo === undefined
-    ) {
-      return NextResponse.json({ message: 'Faltan datos requeridos para crear el producto.', json:{marca,tipoProducto,nombre, descripcion, stock,precio, costo }});
+    const formData = await req.formData()
+    const data ={
+     nombre: formData.get('nombre'),
+    descripcion: formData.get('descripcion'),
+     stock: formData.get('stock'),
+      marca: formData.get('marca'),
+      tipoProducto : formData.get('tipoProducto'),
+      precio : formData.get('precio'),
+      costo: formData.get('costo'),
+      imagen: formData.get('imagen'),
     }
-    const connection = await connectToDatabase();
+    if(!data.imagen){
+      return NextResponse.json('falta imagen')
+    }
+    console.log('???', data)
+    const imagenFile = data.imagen as File; // Asegúrate de que el tipo sea 'File'
+    // const bytes = await imagenFile.arrayBuffer()
+    // const buffer = Buffer.from(bytes)
+    const result = await cloudinary.uploader.upload(data.imagen, {
+      folder: 'productos', // Opcional: Define una carpeta en Cloudinary
+      use_filename: true, // Usa el nombre del archivo original
+      unique_filename: false, // Opcional: Permite nombres repetidos
+    });
+    const { nombre, descripcion, stock, marca, tipoProducto, precio, costo, imagen } = data;
 
-    // Iniciar una transacción para asegurar la atomicidad
+    if (!nombre || !descripcion || stock === undefined || !marca || !tipoProducto || precio === undefined || costo === undefined || !imagen) {
+      return NextResponse.json({ message: 'Faltan datos requeridos para crear el producto.' },{status:500});
+    }
+
+    // Aquí puedes subir la imagen a un servicio de almacenamiento
+
+    const connection = await connectToDatabase();
     await connection.beginTransaction();
 
-    // 1. Verificar si la marca ya existe, si no, insertarla
-    let [resultMarca] = await connection.execute<RowDataPacket[]>(
-      'SELECT id FROM marca WHERE nombre = ?',
-      [marca]
-    );
+    // Lógica para insertar producto
+    let [resultMarca] = await connection.execute('SELECT id FROM marca WHERE nombre = ?', [marca]);
+    let marcaId = resultMarca.length ? resultMarca[0].id : (await connection.execute('INSERT INTO marca (nombre) VALUES (?)', [marca]))[0].insertId;
 
-    let marcaId: number;
-    if (resultMarca.length > 0) {
-      marcaId = resultMarca[0].id;
-    } else {
-      const [insertMarcaResult] = await connection.execute<OkPacket>(
-        'INSERT INTO marca (nombre) VALUES (?)',
-        [marca]
-      );
-      marcaId = insertMarcaResult.insertId;
-    }
+    let [resultTipoProducto] = await connection.execute('SELECT id FROM tipo_producto WHERE nombre = ?', [tipoProducto]);
+    let tipoProductoId = resultTipoProducto.length ? resultTipoProducto[0].id : (await connection.execute('INSERT INTO tipo_producto (nombre) VALUES (?)', [tipoProducto]))[0].insertId;
 
-    // 2. Verificar si el tipo de producto ya existe, si no, insertarlo
-    let [resultTipoProducto] = await connection.execute<RowDataPacket[]>(
-      'SELECT id FROM tipo_producto WHERE nombre = ?',
-      [tipoProducto]
-    );
+    let [resultMarcaTipoProducto] = await connection.execute('SELECT id FROM marca_tipo_producto WHERE marca_id = ? AND tipo_producto_id = ?', [marcaId, tipoProductoId]);
+    let marcaTipoProductoId = resultMarcaTipoProducto.length ? resultMarcaTipoProducto[0].id : (await connection.execute('INSERT INTO marca_tipo_producto (marca_id, tipo_producto_id) VALUES (?, ?)', [marcaId, tipoProductoId]))[0].insertId;
 
-    let tipoProductoId: number;
-    if (resultTipoProducto.length > 0) {
-      tipoProductoId = resultTipoProducto[0].id;
-    } else {
-      const [insertTipoProductoResult] = await connection.execute<OkPacket>(
-        'INSERT INTO tipo_producto (nombre) VALUES (?)',
-        [tipoProducto]
-      );
-      tipoProductoId = insertTipoProductoResult.insertId;
-    }
+    const [resultProducto] = await connection.execute('INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion, foto_url) VALUES (?, ?, ?, ?, NOW(), ?)', [nombre, descripcion, stock, marcaTipoProductoId, result.secure_url]);
+    const productoId = resultProducto.insertId;
 
-    // 3. Verificar si la relación marca-tipoproducto ya existe, si no, insertarla
-    let [resultMarcaTipoProducto] = await connection.execute<RowDataPacket[]>(
-      'SELECT id FROM marca_tipo_producto WHERE marca_id = ? AND tipo_producto_id = ?',
-      [marcaId, tipoProductoId]
-    );
+    await connection.execute('INSERT INTO precio_producto (producto_id, precio, costo, fecha_inicio, fecha_fin) VALUES (?, ?, ?, NOW(), ?)', [productoId, precio, costo, '9999-12-31']);
 
-    let marcaTipoProductoId: number;
-    if (resultMarcaTipoProducto.length > 0) {
-      marcaTipoProductoId = resultMarcaTipoProducto[0].id;
-    } else {
-      const [insertMarcaTipoProductoResult] = await connection.execute<OkPacket>(
-        'INSERT INTO marca_tipo_producto (marca_id, tipo_producto_id) VALUES (?, ?)',
-        [marcaId, tipoProductoId]
-      );
-      marcaTipoProductoId = insertMarcaTipoProductoResult.insertId;
-    }
-
-    // 4. Insertar el producto en la tabla `producto`
-    const [resultProducto] = await connection.execute<OkPacket>(
-      'INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion, foto_url) VALUES (?, ?, ?, ?, NOW(), ?)',
-      [nombre, descripcion, stock, marcaTipoProductoId, imagen]
-    );
-
-    const productoId = resultProducto.insertId; // Obtener el ID del producto insertado
-
-    // 5. Insertar el precio en la tabla `precioproducto`
-    await connection.execute<OkPacket>(
-      'INSERT INTO precio_producto (producto_id, precio, costo, fecha_inicio, fecha_fin) VALUES (?, ?, ?, NOW(), ?)',
-      [productoId, precio, costo, '9999-12-31'] // Fecha de finalización futura para indicar que está activo
-    );
-
-    // Confirmar la transacción
     await connection.commit();
-
-    // Cerrar la conexión
     await connection.end();
 
     return NextResponse.json({ message: 'Producto creado con éxito', productoId });
   } catch (error) {
-    console.error('Error al agregar el producto y el precio:', error);
-
-    // En caso de error, revertir la transacción
-    const connection = await connectToDatabase();
-    await connection.rollback();
-
-    return NextResponse.json({ message: 'Error en el servidor' });
+    console.error('Error al crear el producto:', error);
+    return NextResponse.json({ message: 'Error al crear el producto.' },{status:500});
   }
 }
-export const config = { 
-  api: {
-    bodyParser: {
-      sizeLimit: '1mb',  // Establece el tamaño máximo del cuerpo de la solicitud
-    },
-  },
-};
+

@@ -66,12 +66,12 @@ const ProductForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!nombre || !descripcion || stock === '' || !marcaNombre || tipoProducto === '' || precio === '' || costo === '' || !imagen) {
       setError('Todos los campos son obligatorios, incluida la imagen');
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('nombre', nombre);
     formData.append('descripcion', descripcion);
@@ -80,18 +80,18 @@ const ProductForm = () => {
     formData.append('tipoProducto', tipoProducto);
     formData.append('precio', String(precio));
     formData.append('costo', String(costo));
-    formData.append('imagen', imagen);
-
+    formData.append('imagen', imagen); // Enviamos la imagen en Base64
+  
     try {
       const response = await fetch('/api/productos', {
         method: 'POST',
         body: formData,
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al agregar el producto');
       }
-
+  
       setSuccess(true);
       setNombre('');
       setDescripcion('');
@@ -100,7 +100,7 @@ const ProductForm = () => {
       setTipoProducto('');
       setPrecio('');
       setCosto('');
-      setImagen(null);
+      setImagen('');
     } catch (error) {
       setError('Error al agregar el producto');
     }
@@ -112,7 +112,16 @@ const ProductForm = () => {
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImagen(e.target.files[0]);
+      const file = e.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        if (reader.result) {
+          setImagen(reader.result as string); // Guardamos la imagen como Base64
+        }
+      };
+  
+      reader.readAsDataURL(file); // Convertimos la imagen a Base64
     }
   };
   return (
