@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 // import {  useRouter } from 'next/router';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const EditarProducto: React.FC = () => {
   const { id } = useParams(); // Obtener el id del producto desde la URL
@@ -23,6 +24,7 @@ const EditarProducto: React.FC = () => {
     fecha_inicio: '',
     fecha_fin: '',
     fecha_ultima_actualizacion: '',
+    foto_url:null
   });
 
   useEffect(() => {
@@ -97,6 +99,7 @@ const EditarProducto: React.FC = () => {
         Editar Producto
       </Typography>
       <form onSubmit={handleSubmit}>
+        <Image src={producto.foto_url || ''} alt='Foto de producto' width={500} height={500} ></Image>
         <TextField
           label="Nombre"
           variant="outlined"

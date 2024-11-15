@@ -15,7 +15,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
               pp.costo AS costo,
               p.stock,
               pp.fecha_inicio AS fechaInicio,
-              pp.fecha_fin AS fechaFin
+              pp.fecha_fin AS fechaFin,
+              p.foto_url
           FROM 
               producto p 
           LEFT JOIN 
@@ -90,6 +91,18 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   try {
     const connection = await connectToDatabase();
     
+    const [precioProducto]: any[] = await connection.execute(
+      `DELETE FROM precio_producto WHERE producto_id = ?`,
+      [params.id]
+    );
+    const [ventaProducto]: any[] = await connection.execute(
+      `DELETE FROM venta_producto WHERE producto_id = ?`,
+      [params.id]
+    );
+    const [compra_producto]: any[] = await connection.execute(
+      `DELETE FROM compra_producto WHERE producto_id = ?`,
+      [params.id]
+    );
     const [result]: any[] = await connection.execute(
       `DELETE FROM producto WHERE codigo = ?`,
       [params.id]

@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import CrearMarcaModalComponent from '@/app/components/productos/marcas/CrearMarcaModalComponent';
 import CrearTipoProductoModalComponent from '@/app/components/productos/tipos/CrearTipoProductoModalComponent';
+import Image from 'next/image';
 
 interface Producto {
   codigo: number;
@@ -24,6 +25,7 @@ interface Producto {
   descripcion: string;
   fecha_ultima_actualizacion: string; // Cambié el tipo para reflejar la fecha
   stock: number;
+  foto_url: null | string
 }
 
 const ProductosPage: React.FC = () => {
@@ -99,6 +101,7 @@ const ProductosPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>Imagen</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
               <TableCell>Fecha Última Actualización</TableCell>
@@ -115,6 +118,11 @@ const ProductosPage: React.FC = () => {
                   onClick={() => (window.location.href = `/dashboard/productos/${producto.codigo}`)}
                   style={{ cursor: 'pointer' }}
                 >
+                  <TableCell>
+                    {producto.foto_url !== null &&
+                    <Image src={producto.foto_url} alt='Foto de producto' width={50} height={50} />
+                    }
+                  </TableCell>
                   <TableCell>{producto.nombre}</TableCell>
                   <TableCell>{producto.descripcion}</TableCell>
                   <TableCell>{new Date(producto.fecha_ultima_actualizacion).toLocaleDateString()}</TableCell>
