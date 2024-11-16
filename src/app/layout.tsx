@@ -26,7 +26,7 @@ export default function RootLayout({
       <Box component={'html'} lang="es" bgcolor={'background.default'} >
         <body>
           <Box bgcolor={'Background'}>
-
+            <SidebarComponent/>
             {children}
           </Box>
         </body>
