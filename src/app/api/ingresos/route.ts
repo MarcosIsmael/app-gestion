@@ -1,8 +1,8 @@
 import connectToDatabase from "@/app/lib/db";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import {  NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
     const connection = await connectToDatabase();
 
@@ -20,7 +20,7 @@ export async function GET(req: NextApiRequest) {
     return NextResponse.json({ error: 'Error al obtener las ventas' }, { status: 500 });
   }
 }
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: NextRequest, res: NextApiResponse) {
   const body= await req.json()
   const { fecha, monto, descripcion, metodo_pago_id } = body;
 

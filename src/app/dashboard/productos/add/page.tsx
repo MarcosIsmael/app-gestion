@@ -28,7 +28,7 @@ const ProductForm = () => {
   const [marcas, setMarcas] = useState<{ id: number; nombre: string }[]>([]);
   const [tiposProducto, setTiposProducto] = useState<{ id: number; nombre: string }[]>([]);
   const [error, setError] = useState('');
-  const [imagen, setImagen] = useState<File | null>(null);
+  const [imagen, setImagen] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [tipoProductoModalOpen, setTipoProductoModalOpen] = useState(false);
@@ -262,7 +262,6 @@ const ProductForm = () => {
               Subir Imagen
               <input type="file" hidden accept="image/*" onChange={handleFileChange} />
             </Button>
-            {imagen && <Typography variant="body2">Archivo seleccionado: {imagen.name}</Typography>}
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" fullWidth>

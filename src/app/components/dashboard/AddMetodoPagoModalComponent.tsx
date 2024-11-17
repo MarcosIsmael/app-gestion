@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, Button, TextField, Typography } from '@mui/material';
+import { Modal, Box, Button, TextField, Typography, IconButton } from '@mui/material';
 import axios from 'axios';
 
 // Estilo del modal
@@ -49,9 +49,9 @@ const AddMetodoPagoModalComponent = () => {
   return (
     <div>
       {/* Botón que abre el modal */}
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Agregar Método de Pago
-      </Button>
+      <IconButton  color="primary"  onClick={handleOpen}>
+        +
+      </IconButton>
 
       {/* Modal */}
       <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">

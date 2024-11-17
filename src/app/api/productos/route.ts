@@ -1,26 +1,30 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import {  NextApiResponse } from 'next';
 import connectToDatabase from '../../lib/db';
-import { OkPacket, RowDataPacket } from 'mysql2';
-import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
+import { RowDataPacket } from 'mysql2';
+import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
-import { arrayBuffer } from 'stream/consumers';
 
 
 interface ProductoDBTypes {
-  codigo: number;
   nombre: string;
+  codigo:number;
   descripcion: string;
   stock: number;
+  marca_tipo: number;
+  foto_url:string;
+  precio:string;
+  costo:string
 }
 
-export async function GET(req:NextApiRequest, res:NextApiResponse) {
+export async function GET(req:NextRequest, res:NextApiResponse) {
   try {
     const connection = await connectToDatabase();
 
     // Ejecuta la consulta
     const [rows] = await connection.execute<ProductoDBTypes[] & RowDataPacket[]>(
-      'SELECT * FROM producto'
+      `SELECT p.codigo, p.nombre, p.descripcion, pp.precio, pp.costo , p.stock, p.foto_url  FROM producto p 
+      JOIN precio_producto PP ON PP.producto_id = p.codigo
+      ` 
     );
 
     // Cierra la conexión
@@ -35,18 +39,18 @@ export async function GET(req:NextApiRequest, res:NextApiResponse) {
 }
 
 
-export const config = {
-  api: {
-    bodyParser: true, // Necesario para manejar la carga de archivos con formidable
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: true, // Necesario para manejar la carga de archivos con formidable
+//   },
+// };
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Configura tus variables de entorno
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
     const formData = await req.formData()
     const data ={
@@ -63,10 +67,10 @@ export async function POST(req: Request, res: NextApiResponse) {
       return NextResponse.json('falta imagen')
     }
     console.log('???', data)
-    const imagenFile = data.imagen as File; // Asegúrate de que el tipo sea 'File'
+    const imagenFile = data.imagen as string; // Asegúrate de que el tipo sea 'File'
     // const bytes = await imagenFile.arrayBuffer()
     // const buffer = Buffer.from(bytes)
-    const result = await cloudinary.uploader.upload(data.imagen, {
+    const result = await cloudinary.uploader.upload(imagenFile, {
       folder: 'productos', // Opcional: Define una carpeta en Cloudinary
       use_filename: true, // Usa el nombre del archivo original
       unique_filename: false, // Opcional: Permite nombres repetidos
@@ -83,16 +87,16 @@ export async function POST(req: Request, res: NextApiResponse) {
     await connection.beginTransaction();
 
     // Lógica para insertar producto
-    let [resultMarca] = await connection.execute('SELECT id FROM marca WHERE nombre = ?', [marca]);
-    let marcaId = resultMarca.length ? resultMarca[0].id : (await connection.execute('INSERT INTO marca (nombre) VALUES (?)', [marca]))[0].insertId;
+    let [resultMarca] : any[] = await connection.execute('SELECT id FROM marca WHERE nombre = ?', [marca]);
+    let marcaId = resultMarca.length ? resultMarca[0].id : (await connection.execute('INSERT INTO marca (nombre) VALUES (?)', [marca]) as any )  [0].insertId;
 
-    let [resultTipoProducto] = await connection.execute('SELECT id FROM tipo_producto WHERE nombre = ?', [tipoProducto]);
-    let tipoProductoId = resultTipoProducto.length ? resultTipoProducto[0].id : (await connection.execute('INSERT INTO tipo_producto (nombre) VALUES (?)', [tipoProducto]))[0].insertId;
+    let [resultTipoProducto]:any[] = await connection.execute('SELECT id FROM tipo_producto WHERE nombre = ?', [tipoProducto]);
+    let tipoProductoId = resultTipoProducto.length ? resultTipoProducto[0].id : (await connection.execute('INSERT INTO tipo_producto (nombre) VALUES (?)', [tipoProducto]) as any)[0].insertId;
 
-    let [resultMarcaTipoProducto] = await connection.execute('SELECT id FROM marca_tipo_producto WHERE marca_id = ? AND tipo_producto_id = ?', [marcaId, tipoProductoId]);
-    let marcaTipoProductoId = resultMarcaTipoProducto.length ? resultMarcaTipoProducto[0].id : (await connection.execute('INSERT INTO marca_tipo_producto (marca_id, tipo_producto_id) VALUES (?, ?)', [marcaId, tipoProductoId]))[0].insertId;
+    let [resultMarcaTipoProducto] : any[] = await connection.execute('SELECT id FROM marca_tipo_producto WHERE marca_id = ? AND tipo_producto_id = ?', [marcaId, tipoProductoId]);
+    let marcaTipoProductoId = resultMarcaTipoProducto.length ? resultMarcaTipoProducto[0].id : (await connection.execute('INSERT INTO marca_tipo_producto (marca_id, tipo_producto_id) VALUES (?, ?)', [marcaId, tipoProductoId]) as any)[0].insertId;
 
-    const [resultProducto] = await connection.execute('INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion, foto_url) VALUES (?, ?, ?, ?, NOW(), ?)', [nombre, descripcion, stock, marcaTipoProductoId, result.secure_url]);
+    const [resultProducto]: any = await connection.execute('INSERT INTO producto (nombre, descripcion, stock, marca_tipo, fecha_ultima_actualizacion, foto_url) VALUES (?, ?, ?, ?, NOW(), ?)', [nombre, descripcion, stock, marcaTipoProductoId, result.secure_url]);
     const productoId = resultProducto.insertId;
 
     await connection.execute('INSERT INTO precio_producto (producto_id, precio, costo, fecha_inicio, fecha_fin) VALUES (?, ?, ?, NOW(), ?)', [productoId, precio, costo, '9999-12-31']);

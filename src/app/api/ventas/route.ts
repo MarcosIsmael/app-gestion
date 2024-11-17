@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import connectToDatabase from '@/app/lib/db';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
     const connection = await connectToDatabase();
     const [rows] = await connection.query<RowDataPacket[]>(`

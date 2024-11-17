@@ -3,11 +3,11 @@ import fs from 'fs';
 import path from 'path';
 
 // Deshabilitar el procesamiento automático del cuerpo
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
 
 // Función para manejar la carga de archivos de forma nativa
 export async function POST(req: NextRequest) {

@@ -1,6 +1,6 @@
 // pages/api/estadisticas.ts
 import connectToDatabase from '@/app/lib/db';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, res: NextApiResponse) {

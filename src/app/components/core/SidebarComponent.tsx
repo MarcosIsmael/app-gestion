@@ -14,10 +14,10 @@ export const SidebarComponent = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
-  const { toggleTheme, mode } = useThemeContext();
+  const { toggleTheme, mode } = useThemeContext() as any;
   const [open, setOpen] = useState(false);
 
-  const handleListItemClick = (index, path) => {
+  const handleListItemClick = (index : number, path: string) => {
     setSelectedIndex(index);
     router.push(path);
   };

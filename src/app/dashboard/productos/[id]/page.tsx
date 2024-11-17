@@ -50,7 +50,7 @@ const EditarProducto: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name.includes('precio')) {
-      setProducto((prev) => ({
+      setProducto((prev:any) => ({
         ...prev,
         precio: {
           ...prev.precio,
@@ -58,7 +58,7 @@ const EditarProducto: React.FC = () => {
         },
       }));
     } else {
-      setProducto((prev) => ({
+      setProducto((prev : any) => ({
         ...prev,
         [name]: value,
       }));

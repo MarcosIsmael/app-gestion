@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron": "electron .",
+    "package": "electron-builder",
+    "export": "next export"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -19,6 +22,7 @@
     "cloudinary": "^2.5.1",
     "formidable": "^3.5.2",
     "googleapis": "^144.0.0",
+    "http-server": "^14.1.1",
     "mysql2": "^3.11.3",
     "next": "^14.2.18",
     "next-connect": "^1.0.0",
@@ -28,13 +32,36 @@
     "react-dom": "^18",
     "recharts": "^2.13.3"
   },
+  "build": {
+    "files": [
+      "out/**/*",
+      "main.js"
+    ],
+    "appId": "com.example.my-next-app",
+    "productName": "MyNextApp",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "compilerOptions": {
+    "noEmitOnError": false
+  },
   "devDependencies": {
     "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "typescript": "^5"
-  }
+  },
+  "main": "main.js"
 }

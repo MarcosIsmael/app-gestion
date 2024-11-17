@@ -1,8 +1,8 @@
 import connectToDatabase from '@/app/lib/db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
+import {  NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
     const connection = await connectToDatabase();
 
@@ -18,7 +18,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
     // Extraer el nombre del cuerpo de la solicitud
     const { nombre } = await req.json();
@@ -32,7 +32,7 @@ export async function POST(req: Request, res: NextApiResponse) {
     const connection = await connectToDatabase();
 
     // Comprobar si el tipo de producto ya existe
-    const [existingType] = await connection.execute(
+    const [existingType]: any[]= await connection.execute(
       'SELECT * FROM tipo_producto WHERE nombre = ?',
       [nombre]
     );

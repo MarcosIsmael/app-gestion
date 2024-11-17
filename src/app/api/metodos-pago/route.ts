@@ -1,14 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import {  NextApiResponse } from 'next';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import connectToDatabase from '@/app/lib/db';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface MetodoPago extends RowDataPacket {
   id: number;
   nombre: string;
 }
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextApiResponse) {
 
   try {
     const connection = await connectToDatabase();
@@ -28,7 +28,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
     return NextResponse.json({ message: 'Error al obtener métodos de pago' },{status:500});
   }
 }
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { nombre } = await req.json(); // Obtener los datos enviados desde el cliente
 

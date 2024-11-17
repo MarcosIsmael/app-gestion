@@ -1,9 +1,9 @@
 import connectToDatabase from '@/app/lib/db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
+import {  NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 // Asegúrate de tener esta función para conectar a tu DB
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
     const connection = await connectToDatabase();
 
@@ -22,7 +22,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
 // src/app/api/marcas/route.ts
 
 
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
     // Parsear el cuerpo de la solicitud
     const body = await req.json();
@@ -40,7 +40,7 @@ export async function POST(req: Request, res: NextApiResponse) {
       SELECT * FROM marca WHERE nombre = ?
     `, [nombre]);
 
-    if (existingMarca.length > 0) {
+    if (existingMarca) {
       return NextResponse.json({ error: 'La marca ya existe.', status:400 });
     }
 

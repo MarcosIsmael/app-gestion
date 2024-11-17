@@ -8,12 +8,11 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { Checkbox, FormControlLabel } from '@mui/material';
-import { ProductCat } from '@/app/dashboard/productos/page';
 import { Producto } from '@/app/dashboard/pagos/page';
 
 
 interface Props {
-  handleCheck : (e : ProductCat, type: 'add' | 'remove')=>void,
+  handleCheck : (e : any, type: 'add' | 'remove')=>void,
   producto : Producto
 }
 export const TarjetaProductoComponent = ({ handleCheck, producto}:Props) => {
