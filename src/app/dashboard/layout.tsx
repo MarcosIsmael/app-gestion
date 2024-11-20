@@ -1,7 +1,9 @@
+
 import { Metadata } from 'next';
 import React from 'react'
 import { SidebarComponent } from '../components/core/SidebarComponent';
 import { Box, Paper } from '@mui/material';
+import useAuth from '@/hooks/useAuth';
 interface Props {
   children: React.ReactNode
 }
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
   description: "Dashboard description",
 };
 export default function Layout({ children }: Props) {
+  // useAuth('admin')
   return (
     <Box>
 

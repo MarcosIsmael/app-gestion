@@ -1,11 +1,11 @@
 'use client'
 
-import { Autocomplete, Box, Collapse, IconButton, List, ListItem, ListItemText, TextField, Typography } from "@mui/material"
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Autocomplete, Box,  IconButton, List, ListItem, ListItemText, TextField, Typography } from "@mui/material"
+import { useSearchParams } from 'next/navigation'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { useLayoutEffect, useState, useMemo } from "react"
+import { Suspense, useLayoutEffect, useState } from "react"
 export type PagosParams = { id: string }
 export type ProductForm = object
 
@@ -22,7 +22,15 @@ const opcionesProductos = [
 
 ]
 
-const PagosPage = () => {
+export default function PagosPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <Pagos />
+    </Suspense>
+  );
+}
+
+const Pagos = () => {
   const search = useSearchParams()
   const [productos, setProductos] = useState<Producto[]>([])
   const [estimadoTotal, setEstimadoTotal] = useState(0)
@@ -106,4 +114,3 @@ const PagosPage = () => {
   )
 }
 
-export default PagosPage

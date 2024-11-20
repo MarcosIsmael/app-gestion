@@ -6,7 +6,7 @@ const nextConfig = {
     },
     typescript: {
         // Habilitar esta opción para desactivar la validación de tipos
-        ignoreBuildErrors: true,
+        // ignoreBuildErrors: true,
       },
 };
 

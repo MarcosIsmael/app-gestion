@@ -1,7 +1,20 @@
 // theme.js
 'use client'
 import { createTheme } from '@mui/material/styles';
+import '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface Palette {
+    icon?: {
+      main?: string;
+    };
+  }
+  interface PaletteOptions {
+    icon?: {
+      main?: string;
+    };
+  }
+}
 export const DarkTheme = createTheme({
   palette: {
     mode: 'dark',
