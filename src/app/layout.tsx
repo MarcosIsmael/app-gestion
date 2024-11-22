@@ -23,9 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <ThemeProviderComponent>
-      <Box component={'html'} lang="es" bgcolor={'background.default'} >
+      <Box component={'html'} lang="es" bgcolor={'background.default'} height={'100vh'} >
         <body>
-          <Box bgcolor={'Background'}>
+          <Box>
             <SidebarComponent/>
             {children}
           </Box>

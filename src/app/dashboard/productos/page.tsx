@@ -29,6 +29,7 @@ interface Producto {
 }
 
 const ProductosPage: React.FC = () => {
+  console.log('productos')
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filter, setFilter] = useState<string>('');
   const [modalOpen, setModalOpen] = useState(false);

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, Typography, Container, Box, MenuItem } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ContainerComponent } from '../components/core/ContainerComponent';
 
 const RegisterForm = () => {
   const [name, setName] = useState('');
@@ -51,9 +52,9 @@ const RegisterForm = () => {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
+    <ContainerComponent boxProps={{width:'50%'}}>
       <Box mt={8} display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom color={'primary'}>
           Regístrate
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -130,8 +131,8 @@ const RegisterForm = () => {
               </Button>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="body2" align="center">
-                ¿Ya tienes cuenta?{' '}
+              <Typography variant="body2" align="center" color={'primary'}>
+                ¿Ya tienes cuenta?
                 <Link href="/login" passHref>
                   <Button color="primary">Inicia sesión</Button>
                 </Link>
@@ -140,7 +141,7 @@ const RegisterForm = () => {
           </Grid>
         </form>
       </Box>
-    </Container>
+    </ContainerComponent>
   );
 };
 

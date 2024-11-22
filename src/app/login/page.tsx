@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import { TextField, Button, Grid, Typography, Container, Box } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ContainerComponent } from '../components/core/ContainerComponent';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // Para indicar que estamos esperando la respuesta
-
   const router = useRouter()
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -42,9 +43,9 @@ const LoginForm = () => {
   };
 
   return (
-    <Container maxWidth="xs">
+      <ContainerComponent boxProps={{width:'50%'}}>
       <Box mt={8} display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" color={'primary'} gutterBottom>
           Iniciar sesión
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -81,8 +82,8 @@ const LoginForm = () => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="body2" align="center">
-                ¿No tienes cuenta?{' '}
+              <Typography variant="body2" align="center" color={'primary'}>
+                ¿No tienes cuenta?
                 <Link href="/register" passHref>
                   <Button color="primary">Regístrate</Button>
                 </Link>
@@ -91,7 +92,7 @@ const LoginForm = () => {
           </Grid>
         </form>
       </Box>
-    </Container>
+      </ContainerComponent>
   );
 };
 
