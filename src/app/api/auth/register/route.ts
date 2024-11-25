@@ -1,8 +1,17 @@
 import bcrypt from 'bcrypt';
-import connectToDatabase, {pool} from '@/app/lib/db';  // Importa el pool
+import connectToDatabase from '@/app/lib/db';  // Importa el pool
 import { NextRequest, NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
 export async function POST(req: NextRequest) {
   const { email, password, role } = await req.json();
+  const token = req.cookies.get('auth')?.value;
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+
+  if (!token) return NextResponse.json({ message: 'No tienes permisos para registrar usuarios' }, { status: 401 });
+
+  const { payload } = await jwtVerify(token, secret);
+  if (payload.role !== 'ADMIN') return NextResponse.json({ message: 'No tienes permisos para registrar usuarios' }, { status: 401 });
 
   if (!email || !password || !role) {
     return NextResponse.json({ message: 'Missing fields' }, { status: 400 });
@@ -17,12 +26,11 @@ export async function POST(req: NextRequest) {
     // const connection = await pool.getConnection();
     // // Iniciar una transacción
     // await connection.beginTransaction();
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     // Insertar el usuario en la base de datos
-    console.log('???', role)
     const [result]: any[] = await connection.execute(
-      'INSERT INTO users (email, password, role) VALUES (?, ?, ?)', 
+      'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
       [email, hashedPassword, role]
     );
 
