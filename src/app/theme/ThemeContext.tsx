@@ -1,27 +1,43 @@
-'use client'
-import React, { createContext, useState, useMemo, useContext } from 'react';
+'use client';
+
+import React, { createContext, useState, useMemo, useContext, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { DarkTheme } from './dark';
 import { LigthTheme } from './ligth';
 
 // Crear el contexto
-const ThemeContext = createContext({});
+const ThemeContext = createContext<{
+  mode: string;
+  toggleTheme: () => void;
+}>({
+  mode: 'light',
+  toggleTheme: () => {},
+});
 
-export const ThemeProviderComponent = ({children}:{ children: React.ReactNode }) => {
-  // Estado del tema: "light" o "dark"
-  const [mode, setMode] = useState('light');
+export const ThemeProviderComponent = ({ children }: { children: React.ReactNode }) => {
+  const [mode, setMode] = useState<string | null>(null); // Estado inicial es null
+
+  // Cargar el tema desde localStorage en el cliente
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem('theme') || 'light';
+    setMode(storedTheme);
+  }, []);
 
   // Cambiar el tema de oscuro a claro
   const toggleTheme = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    window.localStorage.setItem('theme', newMode);
   };
 
   // Crear el tema de MUI basado en el modo actual
-  const theme = useMemo(
-    () =>
-     mode === 'dark' ? DarkTheme : LigthTheme,
-    [mode]
-  );
+  const theme = useMemo(() => {
+    if (mode === null) return createTheme(); // Tema temporal durante la carga
+    return mode === 'dark' ? DarkTheme : LigthTheme;
+  }, [mode]);
+
+  // Evitar renderizar el contenido hasta que el tema esté definido
+  if (mode === null) return null;
 
   return (
     <ThemeContext.Provider value={{ toggleTheme, mode }}>

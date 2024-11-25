@@ -40,7 +40,7 @@ export const SidebarComponent = () => {
   const pathname = usePathname();
   const { toggleTheme, mode } = useThemeContext() as any;
   const [open, setOpen] = useState(false);
-console.log('user', user)
+  
   const handleListItemClick = (index: number, path: string) => {
     setSelectedIndex(index);
     router.push(path);
