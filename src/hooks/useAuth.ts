@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 
 export default function useAuth(requiredRole?: string) {
@@ -8,7 +8,8 @@ export default function useAuth(requiredRole?: string) {
   const [user, setUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isFetching = useRef(false); // Indica si hay una llamada pendiente
-
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard/home';
   useEffect(() => {
     const validateSession = async () => {
       if (isFetching.current) return; // Si ya hay una llamada en progreso, no hacer otra
@@ -58,14 +59,20 @@ export default function useAuth(requiredRole?: string) {
           sessionStorage.removeItem('user');
           setUser(null);
           setIsAuthenticated(false);
-          router.replace('/login');
+
+          // Redirigir a login conservando los parámetros actuales
+          const currentPath = window.location.pathname + window.location.search;
+          router.replace(`/login?redirect=${redirectUrl}`);
         }
       } catch (error) {
         console.error('Error validating session:', error);
         sessionStorage.removeItem('user');
         setUser(null);
         setIsAuthenticated(false);
-        router.replace('/login');
+
+        // Redirigir a login conservando los parámetros actuales
+        const currentPath = window.location.pathname + window.location.search;
+        router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
       } finally {
         isFetching.current = false; // Marca que la llamada finalizó
       }
@@ -85,7 +92,9 @@ export default function useAuth(requiredRole?: string) {
         sessionStorage.removeItem('user');
         setUser(null);
         setIsAuthenticated(false);
-        router.replace('/login');
+
+        // Redirigir a login conservando los parámetros actuales
+        router.replace(`/login`);
       } else {
         console.error('Error logging out');
       }

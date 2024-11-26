@@ -4,10 +4,11 @@ import { jwtVerify } from 'jose'; // Importa desde jose
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get('auth')?.value;
   if (!token) {
+    const requestedUrl = req.nextUrl.pathname + req.nextUrl.search;
   console.log('sin token', token)
-  const url = req.nextUrl.clone();
-  url.pathname = '/login';
-    return NextResponse.redirect(url);
+  // const url = req.nextUrl.clone();
+  // url.pathname = '/login';
+  return NextResponse.redirect(new URL(`/login?redirect=${encodeURIComponent(requestedUrl)}`, req.url));
   }
   
   try {
@@ -18,10 +19,12 @@ export async function middleware(req: NextRequest) {
     req.headers.set('user-role', payload.role as string);
     return NextResponse.next();
   } catch (error) {
+    const requestedUrl = req.nextUrl.pathname + req.nextUrl.search;
     console.log('error middleware', error)
-    const url = req.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+    // const url = req.nextUrl.clone();
+    // url.pathname = '/login';
+    return NextResponse.redirect(new URL(`/login?redirect=${encodeURIComponent(requestedUrl)}`, req.url));
+
   }
 }
 

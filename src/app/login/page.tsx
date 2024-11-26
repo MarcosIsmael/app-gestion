@@ -1,9 +1,9 @@
 // src/components/Auth/LoginForm.tsx
 'use client'
 import React, { useState } from 'react';
-import { TextField, Button, Grid, Typography, Container, Box } from '@mui/material';
+import { TextField, Button, Grid, Typography,  Box } from '@mui/material';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ContainerComponent } from '../components/core/ContainerComponent';
 
 const LoginForm = () => {
@@ -12,7 +12,8 @@ const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // Para indicar que estamos esperando la respuesta
   const router = useRouter()
-
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard/home';
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -29,7 +30,7 @@ const LoginForm = () => {
       if (response.ok) {
         // Redirigir a otra página (por ejemplo, al login o al dashboard)
         console.log('redirigir')
-        router.push('/dashboard/home')
+        router.push(redirectUrl)
         // router.push('/dashboard/home
       } else {
         setError(data.message || 'Error al registrar el usuario');
