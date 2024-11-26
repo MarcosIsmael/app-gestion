@@ -23,17 +23,17 @@ interface Producto {
   codigo: number;
   nombre: string;
   descripcion: string;
-  fecha_ultima_actualizacion: string; // Cambié el tipo para reflejar la fecha
+  precio: string;
   stock: number;
-  foto_url: null | string
+  foto_url: null | string;
 }
 
 const ProductosPage: React.FC = () => {
-
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filter, setFilter] = useState<string>('');
   const [modalOpen, setModalOpen] = useState(false);
   const [tipoProductoModalOpen, setTipoProductoModalOpen] = useState(false);
+
   useEffect(() => {
     const fetchProductos = async () => {
       const response = await fetch('/api/productos');
@@ -45,69 +45,91 @@ const ProductosPage: React.FC = () => {
   }, []);
 
   const handleDelete = async (codigo: number) => {
-    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
+    const confirmDelete = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
     if (confirmDelete) {
       const response = await fetch(`/api/productos/${codigo}`, {
         method: 'DELETE',
       });
       if (response.ok) {
-        // Refresca la lista de productos después de eliminar
         setProductos((prev) => prev.filter((producto) => producto.codigo !== codigo));
       } else {
-        console.error("Error al eliminar el producto");
+        console.error('Error al eliminar el producto');
       }
     }
   };
+
   const handleOpen = () => setModalOpen(true);
   const handleClose = () => setModalOpen(false);
   const handleTipoProductoOpen = () => setTipoProductoModalOpen(true);
   const handleTipoProductoClose = () => setTipoProductoModalOpen(false);
+
   return (
     <Box p={2}>
       <CrearMarcaModalComponent open={modalOpen} handleClose={handleClose} />
       <CrearTipoProductoModalComponent open={tipoProductoModalOpen} handleClose={handleTipoProductoClose} />
 
-      <Grid container>
+      <Grid container mb={2}>
         <Grid item xs={6}>
           <Typography variant="h4" gutterBottom>
             Productos
           </Typography>
         </Grid>
-        <Grid item xs={6}>
-          <Button color='primary' size='small' variant='outlined' onClick={handleOpen}>
+        <Grid item xs={6} textAlign="right">
+          <Button color="primary" size="small" variant="outlined" onClick={handleOpen}>
             Nueva marca
           </Button>
-          {/* <Link href={'/dashboard/productos/add/marca'}>
-          </Link> */}
-          <Button color='primary' size='small' variant='outlined' onClick={handleTipoProductoOpen}>
+          <Button color="primary" size="small" variant="outlined" onClick={handleTipoProductoOpen}>
             Nuevo tipo
           </Button>
-          {/* <Link href={'/dashboard/productos/add/tipo'}>
-          </Link> */}
           <Link href={'/dashboard/productos/add'}>
-            <Button color='primary' size='small' variant='outlined'>
+            <Button color="primary" size="small" variant="outlined">
               Agregar Producto
             </Button>
           </Link>
         </Grid>
       </Grid>
+
       <TextField
         label="Buscar producto"
         variant="outlined"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         fullWidth
+        sx={{ marginBottom: 2 }}
       />
-      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-        <Table>
+
+      {/* Contenedor con scroll */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          maxHeight: '400px', // Altura máxima del contenedor para el scroll
+          overflowY: 'auto', // Activar scroll vertical
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#2a2a2a',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#444444',
+            borderRadius: '4px',
+            border: '3px solid #2a2a2a',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#757575',
+          },
+        }}
+      >
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Imagen</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
-              <TableCell>Fecha Última Actualización</TableCell>
+              <TableCell>Precio</TableCell>
               <TableCell>Stock</TableCell>
-              <TableCell>Acciones</TableCell> {/* Nueva columna para acciones */}
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -120,20 +142,20 @@ const ProductosPage: React.FC = () => {
                   style={{ cursor: 'pointer' }}
                 >
                   <TableCell>
-                    {producto.foto_url !== null &&
-                    <Image src={producto.foto_url} alt='Foto de producto' width={50} height={50} />
-                    }
+                    {producto.foto_url !== null && (
+                      <Image src={producto.foto_url} alt="Foto de producto" width={50} height={50} />
+                    )}
                   </TableCell>
                   <TableCell>{producto.nombre}</TableCell>
                   <TableCell>{producto.descripcion}</TableCell>
-                  <TableCell>{new Date(producto.fecha_ultima_actualizacion).toLocaleDateString()}</TableCell>
+                  <TableCell>${producto.precio}</TableCell>
                   <TableCell>{producto.stock}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
                       color="secondary"
                       onClick={(e) => {
-                        e.stopPropagation(); // Evita que la fila se seleccione al hacer clic en el botón
+                        e.stopPropagation();
                         handleDelete(producto.codigo);
                       }}
                     >
